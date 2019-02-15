@@ -10,7 +10,7 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    pass
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost:3306/gatsby?charset=utf8'
 
 
 class ProductionConfig(Config):
