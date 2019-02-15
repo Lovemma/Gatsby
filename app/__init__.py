@@ -20,4 +20,5 @@ def create_app(config_name='default'):
 
 
 def register_blueprint(app):
-    ...
+    from .views import bp
+    app.register_blueprint(bp)
