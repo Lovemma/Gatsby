@@ -3,6 +3,7 @@
 import click
 
 from app import db, create_app
+from app.models import create_user
 
 
 @click.group()
@@ -12,10 +13,24 @@ def cli():
 
 @cli.command()
 def initdb():
-    import app.models
     db.drop_all(app=create_app())
     db.create_all(app=create_app())
     print('Init database successfully.')
+
+
+def _adduser(**kwargs):
+    with create_app().app_context():
+        user = create_user(**kwargs)
+        click.echo(f'User {user.name} created!!! ID: {user.id}')
+
+
+@cli.command()
+@click.option('--name', required=True, prompt=True)
+@click.option('--email', required=False, default=None, prompt=True)
+@click.option('--password', required=True, prompt=True, hide_input=True,
+              confirmation_prompt=True)
+def adduser(name, email, password):
+    _adduser(name=name, email=email, password=password)
 
 
 if __name__ == '__main__':
