@@ -107,3 +107,4 @@ venv.bak/
 
 .idea/
 Pipfile.lock
+/node_modules/

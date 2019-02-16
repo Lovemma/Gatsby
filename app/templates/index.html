@@ -1,1 +1,5 @@
-Hello {{ post.title }}
+{% extends "base.html" %}
+
+{% block bottom_script %}
+    <script src="{{ url_for('static', filename='dist/base.js') }}"></script>
+{% endblock %}
