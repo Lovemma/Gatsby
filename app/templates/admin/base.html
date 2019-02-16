@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}管理后台{% endblock %}
+    </title>
+    {% block doc_head %}
+        <link rel="stylesheet"
+              href="{{ url_for('static', filename='css/uikit.min.css') }}">
+        {% block more_head %}
+        {% endblock %}
+    {% endblock %}
+</head>
+<body>
+{% block tab %}
+    <div class="uk-section-primary uk-preserve-color">
+        <div uk-sticky="animation: uk-animation-slide-top; sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky; cls-inactive: uk-navbar-transparent uk-light; top: 200">
+            <nav class="uk-navbar-container">
+                <div class="uk-container uk-container-expand">
+                    <div uk-navbar>
+
+                        <ul class="uk-navbar-nav">
+                            <li class="uk-active"><a href="/admin">Home</a></li>
+                            <li><a href="{{ url_for('admin.list_posts') }}">Posts</a>
+                            </li>
+                            <li><a href="{{ url_for('admin.list_pages') }}">Pages</a>
+                            </li>
+                            <li><a href="{{ url_for('admin.list_users') }}">Users</a>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+{% endblock %}
+
+<div class="uk-section">
+    <div class="uk-container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+
+<div class="uk-section uk-section-primary uk-preserve-color footer">
+    <div class="uk-container uk-container-center uk-text-center">
+        <ul class="uk-subnav uk-subnav-line uk-flex-center">
+            <li><a href="https://github.com/Lovemma/Gatsby">GitHub</a></li>
+            <li>
+                <a href="https://github.com/Lovemma/Gatsby/blob/master/CHANGELOG.md">Changelog</a>
+            </li>
+        </ul>
+
+        <div class="uk-panel">
+            <p>Made by <a href="https://github.com/pallets/flask"
+                          target="_blank">Flask</a>、
+                <a href="https://getuikit.com" target="_blank">Uikit</a>、
+            </p>
+        </div>
+    </div>
+</div>
+{% block bottom_script %}
+    <script src="{{ url_for('static', filename='dist/admin.js') }}"></script>
+{% endblock %}
+</body>
+</html>

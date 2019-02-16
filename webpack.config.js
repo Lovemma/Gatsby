@@ -1,5 +1,6 @@
 const glob = require('glob');
 const path = require('path');
+const webpack = require('webpack');
 
 const config = {
     entry: glob.sync('./src/**/*.js').reduce(
@@ -36,7 +37,14 @@ const config = {
     output: {
         filename: '[name].js',
         path: path.join(__dirname, 'app/static/dist')
-    }
+    },
+
+    plugins: [
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery"
+        })
+    ]
 };
 
 module.exports = config;

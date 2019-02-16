@@ -1,0 +1,16 @@
+{% extends 'admin/base.html' %}
+
+{% block bottom_script %}
+    <script src="{{ url_for('static', filename='dist/index.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <ul uk-tab>
+        <li class="uk-active"><a href="{{ url_for('admin.list_users') }}">List(0)</a>
+        </li>
+        <li><a href="{{ url_for('admin.new_user') }}">Create</a></li>
+        % if user_id:
+        <li><a href="javascript:void(0)">Edit</a></li>
+        % endif
+    </ul>
+{% endblock %}

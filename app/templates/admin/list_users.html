@@ -1,0 +1,17 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+    {% if msg %}
+        <div class="uk-alert-success" uk-alert>
+            <a class="uk-alert-close" uk-close></a>
+            <p>{{ msg }}</p>
+        </div>
+    {% endif %}
+
+    <ul uk-tab>
+        <li class="uk-active"><a
+                href="{{ url_for('admin.list_users') }}">List({{ total }})</a>
+        </li>
+        <li><a href="{{ url_for('admin.new_user') }}">Create</a></li>
+    </ul>
+{% endblock %}

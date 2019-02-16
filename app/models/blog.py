@@ -7,13 +7,13 @@ from app.models.base import BaseModel
 class Post(BaseModel):
     __tablename__ = 'posts'
 
-    title = db.Column(db.Text)
+    title = db.Column(db.Text(length=100))
 
 
 class Tag(BaseModel):
     __tablename__ = 'tags'
 
-    name = db.Column(db.Text)
+    name = db.Column(db.Text(length=100))
 
 
 class PostTag(BaseModel):
