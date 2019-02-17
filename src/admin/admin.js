@@ -9,3 +9,8 @@ if ($error) {
         timeout: 1000
     });
 }
+
+$('.uk-tab a').on('click', (event) => {
+    let $this = $(event.currentTarget)[0];
+    window.location.replace($this.href);
+});

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from app import db, auth
 from .base import BaseModel
-from app import db
 
 
-class User(BaseModel):
+class User(BaseModel, UserMixin):
     __tablename__ = 'users'
 
     intro = db.Column(db.String(length=100), default='')
@@ -15,6 +16,11 @@ class User(BaseModel):
     password = db.Column(db.Text)
     github_url = db.Column(db.String(length=100), default='')
     active = db.Column(db.Boolean, default=True)
+
+
+def generate_password(password):
+    return generate_password_hash(
+        password, method='pbkdf2:sha256')
 
 
 def create_user(**data):
@@ -37,3 +43,7 @@ def validate_login(name, password):
     if check_password_hash(user.password, password):
         return True, user
     return False, user
+
+@auth.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)

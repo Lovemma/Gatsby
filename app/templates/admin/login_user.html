@@ -20,7 +20,7 @@
                 {{ form.hidden_tag() }}
                 {{ utils.render_field_with_errors(form.name) }}
                 {{ utils.render_field_with_errors(form.password) }}
-                {{ utils.render_submit('Login') }}
+                {{ utils.render_submit(form.submit) }}
             </fieldset>
         </form>
     </div>

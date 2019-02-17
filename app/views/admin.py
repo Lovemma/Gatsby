@@ -4,7 +4,9 @@ from flask import Blueprint, request, render_template
 from flask_login import login_required
 
 from app import db
-from app.models import Post
+from app.forms import UserForm
+from app.models import Post, User
+from app.models.user import generate_password
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -26,7 +28,7 @@ def list_posts():
     return render_template('admin/index.html')
 
 
-@bp.route('/posts/new')
+@bp.route('/posts/new', methods=['GET', 'POST'])
 @login_required
 def new_post():
     return render_template('admin/index.html')
@@ -47,16 +49,60 @@ def new_page():
 @bp.route('/users')
 @login_required
 def list_users():
-    return render_template('admin/index.html')
+    users = User.query.all()
+    total = len(users)
+    return render_template('admin/list_users.html',
+                           users=users, total=total, msg='')
 
 
-@bp.route('/users/new')
+@bp.route('/users/new', methods=['GET', 'POST'])
 @login_required
 def new_user():
-    return render_template('admin/user.html')
+    return _user()
 
 
-@bp.route('/users/<user_id>/edit')
+def _user(user_id=None):
+    form = UserForm(request.form)
+    msg = ''
+
+    if user_id is not None:
+        user = User.query.filter_by(id=user_id).first_or_404()
+
+    if form.validate_on_submit():
+        name = form.name.data
+        email = form.email.data
+        password = form.password.data
+        active = form.active.data
+        user = User.query.filter_by(name=name).first()
+        if user:
+            user.email = email
+            user.password = generate_password(password)
+            user.active = active
+            db.session.add(user)
+            db.session.commit()
+            msg = 'User was successfully updated.'
+        else:
+            user = User(name=name, email=email,
+                        password=generate_password(password), active=active)
+            db.session.add(user)
+            db.session.commit()
+            msg = 'User was successfully created.'
+        users = User.query.all()
+        total = len(users)
+        context = {'users': users, 'total': total, 'msg': msg}
+        return render_template('admin/list_users.html', **context)
+
+    elif user_id is not None:
+        form.name.data = user.name
+        form.email.data = user.email
+        form.active.data = 'on' if user.active else 'off'
+        form.submit.label.text = 'Update'
+        form.password.data = ''
+    return render_template('admin/user.html', form=form, msg=msg,
+                           user_id=user_id)
+
+
+@bp.route('/users/<user_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_user(user_id):
-    return render_template('admin/user.html', user_id=user_id)
+    return _user(user_id)

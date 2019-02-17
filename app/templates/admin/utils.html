@@ -1,22 +1,28 @@
 {% macro render_field_with_errors(field) %}
     {% set label_id = field.label.field_id %}
-    {% set type = 'password' if label_id == 'password' else 'text' %}
+    {% set type = label_id if label_id in ('email', 'password') else 'text' %}
+
     <div class="uk-margin">
         <label class="uk-form-label"
                for="{{ label_id }}">{{ field.label.text }}</label>
         <div class="uk-form-controls">
-            <input name="{{ label_id }}"
-                   class="uk-input uk-form-width-medium {{ 'uk-form-danger' if field.errors else '' }}"
-                   type="{{ type }}">
-            {% if field.errors %}
-                <span class="control-label uk-form-danger">{{ field.errors[0] }}</span>
+            {% if field.widget.input_type != 'checkbox' %}
+                <input name="{{ label_id }}"
+                       class="uk-input uk-form-width-medium {{ 'uk-form-danger' if field.errors else '' }}"
+                       type="{{ type }}" value={{ field.data }}>
+                {% if field.errors %}
+                    <span class="control-label uk-form-danger">{{ field.errors[0] }}</span>
+                {% endif %}
+            {% else %}
+                <input class="uk-checkbox" type="checkbox" name="{{ label_id }}"
+                       checked>
             {% endif %}
         </div>
     </div>
 {% endmacro %}
 
-{% macro render_submit(text) %}
-    <button class="uk-button uk-button-primary uk-button-small">{{ text }}
+{% macro render_submit(field) %}
+    <button class="uk-button uk-button-primary uk-button-small">{{ field.label.text }}
     </button>
 {% endmacro %}
 
