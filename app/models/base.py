@@ -17,5 +17,9 @@ class BaseModel(db.Model):
         db.session.commit()
         return instance
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
     def url(self):
         return f'/{self.__class__.__name__.lower()}/{self.id}/'
