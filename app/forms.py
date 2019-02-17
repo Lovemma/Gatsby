@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import (
+    StringField, PasswordField, SubmitField, BooleanField, IntegerField,
+    SelectField
+)
 from wtforms.validators import DataRequired
 
 
@@ -21,4 +24,11 @@ class UserForm(FlaskForm):
 
 class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
+    slug = StringField('Slug')
+    summary = StringField('Summary')
+    can_comment = BooleanField('CanComment', default=True)
+    author_id = IntegerField('AuthorId', default='',
+                             validators=[DataRequired()])
+    published = SelectField('Published', choices=[('on', 1), ('off', 0)],
+                            default='on')
     submit = SubmitField('Submit')
