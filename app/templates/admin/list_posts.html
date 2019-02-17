@@ -1,0 +1,47 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+    {% if msg %}
+        <div class="uk-alert-success" uk-alert>
+            <a class="uk-alert-close" uk-close></a>
+            <p>{{ msg }}</p>
+        </div>
+    {% endif %}
+
+    <ul uk-tab>
+        <li class="uk-active">
+            <a href="{{ url_for('admin.list_posts') }}">List({{ total }})</a>
+        </li>
+        <li><a href="{{ url_for('admin.new_post') }}">Create</a></li>
+    </ul>
+
+    <table class="uk-table uk-table-hover uk-table-divider">
+        <thead>
+        <tr>
+            <th></th>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Created_at</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for post in posts %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('admin.edit_post', post_id=post.id) }}">
+                        <span uk-icon="file-edit"></span>
+                    </a>
+                    <a data-id="{{ post.id }}">
+                        <span uk-icon="trash"></span>
+                    </a>
+                </td>
+                <td>{{ post.id }}</td>
+                <td>{{ post.title }}</td>
+                <td>{{ post.created_at }}</td>
+                <td></td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+{% endblock %}

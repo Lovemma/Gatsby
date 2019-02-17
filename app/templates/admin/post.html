@@ -1,0 +1,27 @@
+{% extends 'admin/base.html' %}
+
+{% import 'admin/utils.html' as utils %}
+
+{% block content %}
+    <ul uk-tab>
+        <li><a href="{{ url_for('admin.list_posts') }}">List</a></li>
+        <li class="{{ 'uk-active' if not post_id else '' }}"><a
+                href="{{ url_for('admin.new_post') if post_id else 'javascript:void(0)' }}">Create</a>
+        </li>
+        {% if post_id %}
+
+            <li class="{{ 'uk-active' if post_id else '' }}"><a
+                    href="javascript:void(0)">Edit</a></li>
+        {% endif %}
+    </ul>
+
+    <form class="uk-form-horizontal uk-margin-large post-form"
+          action="{{ url_for('admin.edit_post', post_id=post_id) if post_id else url_for('admin.new_post') }}"
+          method="POST" name="post_form">
+        <fieldset class="uk-fieldset">
+            {{ form.hidden_tag() }}
+            {{ utils.render_field_with_errors(form.title) }}
+            {{ utils.render_submit(form.submit) }}
+        </fieldset>
+    </form>
+{% endblock %}

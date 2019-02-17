@@ -4,7 +4,7 @@ from flask import Blueprint, request, render_template
 from flask_login import login_required
 
 from app import db
-from app.forms import UserForm
+from app.forms import UserForm, PostForm
 from app.models import Post, User
 from app.models.user import generate_password
 
@@ -25,13 +25,50 @@ def index():
 @bp.route('/posts')
 @login_required
 def list_posts():
-    return render_template('admin/index.html')
+    posts = Post.query.all()
+    total = len(posts)
+    return render_template('admin/list_posts.html',
+                           posts=posts, total=total, msg='')
 
 
 @bp.route('/posts/new', methods=['GET', 'POST'])
 @login_required
 def new_post():
-    return render_template('admin/index.html')
+    return _post()
+
+
+def _post(post_id=None):
+    form = PostForm(request.form)
+    msg = ''
+
+    if post_id is not None:
+        post = Post.query.filter_by(id=post_id).first_or_404()
+
+    if form.validate_on_submit():
+        title = form.title.data
+        post = Post.query.filter_by(title=title).first()
+        if post:
+            db.session.add(post)
+            db.session.commit()
+            msg = 'Post was successfully updated.'
+        else:
+            post = Post(title=title)
+            db.session.add(post)
+            db.session.commit()
+            msg = 'Post was successfully created.'
+        posts = Post.query.all()
+        total = len(posts)
+        context = {'posts': posts, 'total': total, 'msg': msg}
+        return render_template('admin/list_posts.html', **context)
+    elif post_id is not None:
+        form.submit.label.text = 'Update'
+    return render_template('admin/post.html',
+                               form=form, msg=msg, post_id=post_id)
+
+
+@bp.route('/post/<post_id>/edit', methods=['GET', 'POST'])
+def edit_post(post_id=None):
+    return _post(post_id=post_id)
 
 
 @bp.route('/pages')

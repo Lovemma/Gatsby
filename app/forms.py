@@ -17,3 +17,8 @@ class UserForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     active = BooleanField('Active')
     submit = SubmitField('Submit')
+
+
+class PostForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    submit = SubmitField('Submit')
