@@ -12,7 +12,7 @@ class User(BaseModel, UserMixin):
 
     intro = db.Column(db.String(length=100), default='')
     email = db.Column(db.String(length=100))
-    name = db.Column(db.Text)
+    name = db.Column(db.String(length=100), unique=True)
     password = db.Column(db.Text)
     github_url = db.Column(db.String(length=100), default='')
     active = db.Column(db.Boolean, default=True)
@@ -43,6 +43,7 @@ def validate_login(name, password):
     if check_password_hash(user.password, password):
         return True, user
     return False, user
+
 
 @auth.user_loader
 def load_user(user_id):

@@ -15,9 +15,9 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @login_required
 def index():
     title = request.args.get('title', 'World')
-    post = Post(title=title)
-    db.session.add(post)
-    db.session.commit()
+    # post = Post(title=title)
+    # db.session.add(post)
+    # db.session.commit()
 
     return render_template('admin/index.html')
 

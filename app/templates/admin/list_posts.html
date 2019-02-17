@@ -20,8 +20,12 @@
         <tr>
             <th></th>
             <th>ID</th>
-            <th>Title</th>
+            <th class="uk-table-expand">Title</th>
+            <th>Tag</th>
+            <th>Author</th>
             <th>Created_at</th>
+            <th>Published</th>
+            <th>View</th>
         </tr>
         </thead>
         <tbody>
@@ -37,8 +41,17 @@
                 </td>
                 <td>{{ post.id }}</td>
                 <td>{{ post.title }}</td>
-                <td>{{ post.created_at }}</td>
-                <td></td>
+                <td>
+                    {% for tag in post.tags %}
+                        <a href="{{ tag.url() }}">{{ tag.name }}</a>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{{ post.author.url() }}">{{ post.author.name }}</a>
+                </td>
+                <td>{{ post.create_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>{{ 'published' if post.published else 'unpublished' }}</td>
+                <td><a href="{{ post.preview_url() }}">Preview</a></td>
             </tr>
         {% endfor %}
 

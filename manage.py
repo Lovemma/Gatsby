@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import click
+from sqlalchemy.exc import IntegrityError
 
 from app import db, create_app
 from app.models import create_user
@@ -20,8 +21,12 @@ def initdb():
 
 def _adduser(**kwargs):
     with create_app().app_context():
-        user = create_user(**kwargs)
-        click.echo(f'User {user.name} created!!! ID: {user.id}')
+        try:
+            user = create_user(**kwargs)
+        except IntegrityError as e:
+            click.echo(str(e))
+        else:
+            click.echo(f'User {user.name} created!!! ID: {user.id}')
 
 
 @cli.command()
