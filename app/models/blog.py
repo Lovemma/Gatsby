@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from sqlalchemy import or_
+
 from app import db
 from app.models.base import BaseModel
 
@@ -19,12 +21,12 @@ class Post(BaseModel):
         tags = kwargs.pop('tags', [])
         obj = super().create(**kwargs)
         if tags:
-            PostTag.update_multi(obj.id, tags, [])
+            PostTag.update_multi(obj.id, tags)
         return obj
 
     def update_tags(self, tagnames):
         if tagnames:
-            PostTag.update_multi(self.id, tagnames, [])
+            PostTag.update_multi(self.id, tagnames)
         return True
 
     @property
@@ -32,8 +34,8 @@ class Post(BaseModel):
         pts = PostTag.query.filter_by(post_id=self.id).all()
         if not pts:
             return []
-        pt_ids = [pt.tag_id for pt in pts]
-        return Tag.query.filter(Tag.id.in_(pt_ids)).all()
+        ids = [pt.tag_id for pt in pts]
+        return Tag.query.filter(Tag.id.in_(ids)).all()
 
     @property
     def author(self):
@@ -67,17 +69,12 @@ class PostTag(BaseModel):
     tag_id = db.Column(db.Integer)
 
     @classmethod
-    def update_multi(cls, post_id, tags, origin_tags=None):
-        if origin_tags is None:
-            origin_tags = Post.query.get(post_id).tags
-        need_add = set()
-        need_del = set()
-        for tag in tags:
-            if tag not in origin_tags:
-                need_add.add(tag)
-        for tag in origin_tags:
-            if tag not in tags:
-                need_del.add(tag)
+    def update_multi(cls, post_id, tags):
+        tags = set(tags)
+        origin_tags = set([t.name for t in Post.query.get(post_id).tags])
+
+        need_add = tags - origin_tags
+        need_del = origin_tags - tags
         need_add_tag_ids = set()
         need_del_tag_ids = set()
         for tag_name in need_add:
@@ -89,6 +86,7 @@ class PostTag(BaseModel):
 
         if need_del_tag_ids:
             cls.query.filter(cls.post_id == post_id,
-                             cls.tag_id.in_(need_del_tag_ids)).delete()
+                             cls.tag_id.in_(need_del_tag_ids)).delete(synchronize_session=False)
+            db.session.commit()
         for tag_id in need_add_tag_ids:
             PostTag.get_or_create(post_id=post_id, tag_id=tag_id)
