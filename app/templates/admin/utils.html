@@ -18,14 +18,21 @@
                     {% endif %}
                 {% else %}
                     <input class="uk-checkbox" type="checkbox"
-                           name="{{ label_id }}"
-                           checked>
+                           name="{{ label_id }}" value="{{ field.data }}"
+                            {% if field.data %}
+                           checked
+                            {% endif %}
+                    >
                 {% endif %}
             </div>
         {% else %}
+            <div class="uk-form-controls">
+                <input type="uk-checkbox" name="{{ label_id }}"
+                       class="switch-input" value="{{ field.data }}">
+            </div>
             <label class="uk-switch">
-                <input type="checkbox" name="{{ label_id }}"
-                        {% if field.data %}
+                <input type="checkbox" name="{{ field.data }}"
+                        {% if field.data == 'on' %}
                        checked
                         {% endif %}
                 >

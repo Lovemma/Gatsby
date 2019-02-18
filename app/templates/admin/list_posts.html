@@ -35,7 +35,9 @@
                     <a href="{{ url_for('admin.edit_post', post_id=post.id) }}">
                         <span uk-icon="file-edit"></span>
                     </a>
-                    <a data-id="{{ post.id }}">
+                    <a class="delete"
+                       data-url="{{ url_for('api.delete', post_id=post.id) }}"
+                       data-id="{{ post.id }}">
                         <span uk-icon="trash"></span>
                     </a>
                 </td>

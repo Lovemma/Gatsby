@@ -32,9 +32,6 @@
                     <a href="{{ url_for('admin.edit_user', user_id=user.id) }}">
                         <span uk-icon="file-edit"></span>
                     </a>
-                    <a data-id="{{ user.id }}">
-                        <span uk-icon="trash"></span>
-                    </a>
                 </td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>

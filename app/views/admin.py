@@ -53,6 +53,7 @@ def _post(post_id=None):
         else:
             post = Post()
             msg = 'Post was successfully created.'
+        form.published.data = form.published.data == 'on'
         form.populate_obj(post)
         post.save()
         posts = Post.query.all()
@@ -61,6 +62,8 @@ def _post(post_id=None):
         return render_template('admin/list_posts.html', **context)
     elif post_id is not None:
         form = PostForm(obj=post)
+        form.can_comment.data = post.can_comment
+        form.published.data = 'on' if post.published else 'off'
         form.submit.label.text = 'Update'
     return render_template('admin/post.html',
                            form=form, msg=msg, post_id=post_id)
@@ -128,11 +131,10 @@ def _user(user_id=None):
         return render_template('admin/list_users.html', **context)
 
     elif user_id is not None:
-        form.name.data = user.name
-        form.email.data = user.email
-        form.active.data = 'on' if user.active else 'off'
-        form.submit.label.text = 'Update'
+        form = UserForm(obj=user)
         form.password.data = ''
+        form.active.data = user.active
+        form.submit.label.text = 'Update'
     return render_template('admin/user.html', form=form, msg=msg,
                            user_id=user_id)
 
