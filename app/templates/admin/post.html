@@ -23,6 +23,7 @@
             {{ utils.render_field_with_errors(form.title) }}
             {{ utils.render_field_with_errors(form.slug) }}
             {{ utils.render_field_with_errors(form.summary) }}
+            <textarea id="content"></textarea>
             {{ utils.render_field_with_errors(form.tags, option='tags', tags=tags) }}
             {{ utils.render_field_with_errors(form.author_id, option='authors', authors=authors) }}
             {{ utils.render_field_with_errors(form.can_comment) }}

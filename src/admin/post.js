@@ -4,6 +4,11 @@ import './admin';
 import UIkit from './base';
 import "../scss/select.scss";
 
+import SimpleMDE from '../vendor/simplemde';
+import '../css/font-awesome.min.css';
+import '../css/simplemde.min.css';
+import '../scss/coremirror.scss';
+
 let $switchInput = $('.switch-input');
 let $switcher = $('.uk-switch input');
 
@@ -18,6 +23,8 @@ $switcher.on('click', (event) => {
         $switchInput.attr('value', 'off');
     }
 });
+
+let simplemde = new SimpleMDE({element: $("#content")[0]});
 
 $(document).ready(() => {
     $("select").select2({
