@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from config import config
 
+_app = Flask(__name__)
 db = SQLAlchemy()
 auth = LoginManager()
 auth.login_view = 'index.login'
@@ -22,17 +23,16 @@ class Request(_Request):
 
 
 def create_app(config_name='default'):
-    app = Flask(__name__)
-    app.request_class = Request
-    app.config.from_object(config[config_name])
+    _app.request_class = Request
+    _app.config.from_object(config[config_name])
 
-    db.init_app(app)
-    auth.init_app(app)
-    config[config_name].init_app(app)
+    db.init_app(_app)
+    auth.init_app(_app)
+    config[config_name].init_app(_app)
 
-    register_blueprint(app)
+    register_blueprint(_app)
 
-    return app
+    return _app
 
 
 def register_blueprint(app):
@@ -40,3 +40,6 @@ def register_blueprint(app):
     app.register_blueprint(admin_bp)
     from app.views.index import bp as index_bp
     app.register_blueprint(index_bp)
+
+
+from .filters import has_attr

@@ -51,10 +51,25 @@
                 </td>
                 <td>{{ post.create_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                 <td>{{ 'published' if post.published else 'unpublished' }}</td>
+                <td>
+                    <label class="uk-switch">
+                        <input type="checkbox"
+
+                                {% if post.published %}
+                               checked
+                                {% endif %}
+                        >
+                        <div class="uk-switch-slider uk-switch-on-off round"></div>
+                    </label>
+                </td>
                 <td><a href="{{ post.preview_url() }}">Preview</a></td>
             </tr>
         {% endfor %}
 
         </tbody>
     </table>
+{% endblock %}
+
+{% block bottom_script %}
+    <script src="{{ url_for('static', filename='dist/post.js') }}"></script>
 {% endblock %}

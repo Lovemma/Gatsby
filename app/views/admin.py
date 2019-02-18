@@ -48,22 +48,22 @@ def _post(post_id=None):
         title = form.title.data
         post = Post.query.filter_by(title=title).first()
         if post:
-            db.session.add(post)
-            db.session.commit()
+            post.save()
             msg = 'Post was successfully updated.'
         else:
-            post = Post(title=title)
-            db.session.add(post)
-            db.session.commit()
+            post = Post()
             msg = 'Post was successfully created.'
+        form.populate_obj(post)
+        post.save()
         posts = Post.query.all()
         total = len(posts)
         context = {'posts': posts, 'total': total, 'msg': msg}
         return render_template('admin/list_posts.html', **context)
     elif post_id is not None:
+        form = PostForm(obj=post)
         form.submit.label.text = 'Update'
     return render_template('admin/post.html',
-                               form=form, msg=msg, post_id=post_id)
+                           form=form, msg=msg, post_id=post_id)
 
 
 @bp.route('/post/<post_id>/edit', methods=['GET', 'POST'])
@@ -115,14 +115,12 @@ def _user(user_id=None):
             user.email = email
             user.password = generate_password(password)
             user.active = active
-            db.session.add(user)
-            db.session.commit()
+            user.save()
             msg = 'User was successfully updated.'
         else:
             user = User(name=name, email=email,
                         password=generate_password(password), active=active)
-            db.session.add(user)
-            db.session.commit()
+            user.save()
             msg = 'User was successfully created.'
         users = User.query.all()
         total = len(users)

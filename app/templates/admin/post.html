@@ -21,6 +21,11 @@
         <fieldset class="uk-fieldset">
             {{ form.hidden_tag() }}
             {{ utils.render_field_with_errors(form.title) }}
+            {{ utils.render_field_with_errors(form.slug) }}
+            {{ utils.render_field_with_errors(form.summary) }}
+            {{ utils.render_field_with_errors(form.author_id) }}
+            {{ utils.render_field_with_errors(form.can_comment) }}
+            {{ utils.render_field_with_errors(form.published) }}
             {{ utils.render_submit(form.submit) }}
         </fieldset>
     </form>
