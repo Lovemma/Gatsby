@@ -54,6 +54,7 @@
                 <td>
                     <label class="uk-switch">
                         <input type="checkbox"
+                               data-url="{{ url_for('api.publish', post_id=post.id) }}"
 
                                 {% if post.published %}
                                checked

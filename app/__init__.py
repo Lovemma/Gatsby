@@ -40,6 +40,8 @@ def register_blueprint(app):
     app.register_blueprint(admin_bp)
     from app.views.index import bp as index_bp
     app.register_blueprint(index_bp)
+    from app.views.api import bp as api_bp
+    app.register_blueprint(api_bp)
 
 
 from .filters import has_attr
