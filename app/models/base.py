@@ -23,3 +23,14 @@ class BaseModel(db.Model):
 
     def url(self):
         return f'/{self.__class__.__name__.lower()}/{self.id}/'
+
+    @classmethod
+    def get_or_create(cls, **kwargs):
+        instance = cls.query.filter_by(**kwargs).first()
+        if instance:
+            return instance, False
+        return cls.create(**kwargs), True
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()

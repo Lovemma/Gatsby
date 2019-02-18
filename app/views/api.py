@@ -32,5 +32,5 @@ def delete(post_id):
     post = Post.query.get(post_id)
     if not post:
         return json.dumps({'r': 1, 'msg': 'Post not exist'})
-    post.query.delete()
+    post.delete()
     return json.dumps({'r': 0})

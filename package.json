@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "uikit": "^3.0.3",
-    "jquery": "^3.3.1"
+    "jquery": "^3.3.1",
+    "select2": "^4.0.5"
   }
 }

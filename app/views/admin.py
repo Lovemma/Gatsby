@@ -3,9 +3,8 @@
 from flask import Blueprint, request, render_template
 from flask_login import login_required
 
-from app import db
 from app.forms import UserForm, PostForm
-from app.models import Post, User
+from app.models import Post, User, Tag
 from app.models.user import generate_password
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -46,6 +45,7 @@ def _post(post_id=None):
 
     if form.validate_on_submit():
         title = form.title.data
+        assert str(form.author_id.data).isdigit()
         post = Post.query.filter_by(title=title).first()
         if post:
             post.save()
@@ -54,19 +54,26 @@ def _post(post_id=None):
             post = Post()
             msg = 'Post was successfully created.'
         form.published.data = form.published.data == 'on'
+        tags = form.tags.data
+        del form.tags
         form.populate_obj(post)
         post.save()
+        post.update_tags(tags)
         posts = Post.query.all()
         total = len(posts)
         context = {'posts': posts, 'total': total, 'msg': msg}
         return render_template('admin/list_posts.html', **context)
     elif post_id is not None:
         form = PostForm(obj=post)
+        form.tags.data = [tag.name for tag in post.tags]
         form.can_comment.data = post.can_comment
         form.published.data = 'on' if post.published else 'off'
         form.submit.label.text = 'Update'
+    tags = Tag.query.all()
+    authors = User.query.all()
     return render_template('admin/post.html',
-                           form=form, msg=msg, post_id=post_id)
+                           form=form, msg=msg, post_id=post_id, tags=tags,
+                           authors=authors)
 
 
 @bp.route('/post/<post_id>/edit', methods=['GET', 'POST'])

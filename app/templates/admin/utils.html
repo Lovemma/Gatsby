@@ -1,4 +1,4 @@
-{% macro render_field_with_errors(field) %}
+{% macro render_field_with_errors(field, option=None) %}
     {% set label_id = field.label.field_id %}
     {% set type = label_id if label_id in ('email', 'password') else 'text' %}
     {% set is_switch = field.widget| hasattr('multiple') %}
@@ -6,13 +6,48 @@
     <div class="uk-margin">
         <label class="uk-form-label"
                for="{{ label_id }}">{{ field.label.text }}</label>
+        <div class="uk-form-controls">
+            {% if field.type == 'SwitchField' %}
+                <input type="uk-checkbox" name="{{ label_id }}"
+                       class="switch-input" value="{{ field.data }}">
+                <label class="uk-switch">
+                    <input type="checkbox" value="{{ field.data }}"
+                            {% if field.data == 'on' %}
+                           checked
+                            {% endif %}
+                    >
+                    <label class="uk-switch-slider uk-switch-on-off round"></label>
+                </label>
 
-        {% if not is_switch %}
-            <div class="uk-form-controls">
+            {% elif field.type == 'SelectField' %}
+                <select name="{{ label_id }}">
+                    {% for item in kwargs.pop(option) %}
+                        <option value="{{ item.id }}"
+                                {% if item.id == item.data %}
+                                selected="selected"
+                                {% endif %}
+                        >
+                            {{ item.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% elif field.type == 'SelectMultipleField' %}
+                <select name="{{ label_id }}" multiple="multiple">
+                    {% for item in kwargs.pop(option) %}
+                        <option value="{{ item.name }}"
+                                {% if item.name in field.data %}
+                                selected="selected"
+                                {% endif %}
+                        >
+                            {{ item.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% else %}
                 {% if field.widget.input_type != 'checkbox' %}
                     <input name="{{ label_id }}"
-                           class="uk-input uk-form-width-medium {{ 'uk-form-danger' if field.errors else '' }}"
-                           type="{{ type }}" value={{ field.data }}>
+                           class="uk-input uk-form-width-large {{ 'uk-form-danger' if field.errors else '' }}"
+                           type="{{ type }}" value="{{ field.data }}">
                     {% if field.errors %}
                         <span class="control-label uk-form-danger">{{ field.errors[0] }}</span>
                     {% endif %}
@@ -24,22 +59,8 @@
                             {% endif %}
                     >
                 {% endif %}
-            </div>
-        {% else %}
-            <div class="uk-form-controls">
-                <input type="uk-checkbox" name="{{ label_id }}"
-                       class="switch-input" value="{{ field.data }}">
-            </div>
-            <label class="uk-switch">
-                <input type="checkbox" name="{{ field.data }}"
-                        {% if field.data == 'on' %}
-                       checked
-                        {% endif %}
-                >
-                <div class="uk-switch-slider uk-switch-on-off round"></div>
-            </label>
-        {% endif %}
-
+            {% endif %}
+        </div>
     </div>
 {% endmacro %}
 

@@ -22,9 +22,18 @@ class Post(BaseModel):
             PostTag.update_multi(obj.id, tags, [])
         return obj
 
+    def update_tags(self, tagnames):
+        if tagnames:
+            PostTag.update_multi(self.id, tagnames, [])
+        return True
+
     @property
     def tags(self):
-        return []
+        pts = PostTag.query.filter_by(post_id=self.id).all()
+        if not pts:
+            return []
+        pt_ids = [pt.tag_id for pt in pts]
+        return Tag.query.filter(Tag.id.in_(pt_ids)).all()
 
     @property
     def author(self):
@@ -72,14 +81,14 @@ class PostTag(BaseModel):
         need_add_tag_ids = set()
         need_del_tag_ids = set()
         for tag_name in need_add:
-            tag = Tag.create(name=tag_name)
+            tag, _ = Tag.get_or_create(name=tag_name)
             need_add_tag_ids.add(tag.id)
         for tag_name in need_del:
-            tag = Tag.create(name=tag_name)
+            tag, _ = Tag.get_or_create(name=tag_name)
             need_del_tag_ids.add(tag.id)
 
         if need_del_tag_ids:
             cls.query.filter(cls.post_id == post_id,
                              cls.tag_id.in_(need_del_tag_ids)).delete()
         for tag_id in need_add_tag_ids:
-            PostTag.create(post_id=post_id, tag_id=tag_id)
+            PostTag.get_or_create(post_id=post_id, tag_id=tag_id)

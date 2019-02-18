@@ -1,11 +1,43 @@
 # -*- coding: utf-8 -*-
 
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm as _FlaskForm
 from wtforms import (
-    StringField, PasswordField, SubmitField, BooleanField, IntegerField,
-    SelectField
+    StringField, PasswordField, SubmitField, BooleanField, SelectField,
+    SelectMultipleField
 )
+from wtforms.compat import iteritems
 from wtforms.validators import DataRequired
+
+
+class SwitchField(SelectField):
+    ...
+
+
+class FlaskForm(_FlaskForm):
+    def validate(self, extra_validators=None):
+        """
+        Validates the form by calling `validate` on each field.
+
+        :param extra_validators:
+            If provided, is a dict mapping field names to a sequence of
+            callables which will be passed as extra validators to the field's
+            `validate` method.
+
+        Returns `True` if no errors occur.
+        """
+        self._errors = None
+        success = True
+        for name, field in iteritems(self._fields):
+            if field.type in ('SelectField', 'SelectMultipleField'):
+                continue
+
+            if extra_validators is not None and name in extra_validators:
+                extra = extra_validators[name]
+            else:
+                extra = tuple()
+            if not field.validate(self, extra):
+                success = False
+        return success
 
 
 class LoginForm(FlaskForm):
@@ -27,8 +59,9 @@ class PostForm(FlaskForm):
     slug = StringField('Slug')
     summary = StringField('Summary')
     can_comment = BooleanField('CanComment', default=True)
-    author_id = IntegerField('AuthorId', default='',
-                             validators=[DataRequired()])
-    published = SelectField('Published', choices=[('on', 1), ('off', 0)],
+    tags = SelectMultipleField('Tags', default=[])
+    author_id = SelectField('AuthorId', default='',
+                            validators=[DataRequired()])
+    published = SwitchField('Published', choices=[('on', 1), ('off', 0)],
                             default='on')
     submit = SubmitField('Submit')
