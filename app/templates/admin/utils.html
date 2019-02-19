@@ -31,6 +31,8 @@
                         </option>
                     {% endfor %}
                 </select>
+            {% elif field.type == 'TextAreaField' %}
+                <textarea name="{{ label_id }}" class="uk-textarea"></textarea>
             {% elif field.type == 'SelectMultipleField' %}
                 <select name="{{ label_id }}" multiple="multiple">
                     {% for item in kwargs.pop(option) %}

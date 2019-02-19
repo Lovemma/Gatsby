@@ -19,9 +19,11 @@ class Post(BaseModel):
     @classmethod
     def create(cls, **kwargs):
         tags = kwargs.pop('tags', [])
+        content = kwargs.pop('content')
         obj = super().create(**kwargs)
         if tags:
             PostTag.update_multi(obj.id, tags)
+        obj.set_content(content)
         return obj
 
     def update_tags(self, tagnames):
@@ -44,6 +46,19 @@ class Post(BaseModel):
 
     def preview_url(self):
         return f'/{self.__class__.__name__.lower()}/{self.id}/preview'
+
+    def set_content(self, content):
+        return self.set_props_by_key('content', content)
+
+    def save(self, **kwargs):
+        content = kwargs.pop('content', None)
+        if content is not None:
+            self.set_content(content)
+        return super().save()
+
+    @property
+    def content(self):
+        return self.get_props_by_key('content').decode('utf-8')
 
 
 class Tag(BaseModel):
@@ -86,7 +101,8 @@ class PostTag(BaseModel):
 
         if need_del_tag_ids:
             cls.query.filter(cls.post_id == post_id,
-                             cls.tag_id.in_(need_del_tag_ids)).delete(synchronize_session=False)
+                             cls.tag_id.in_(need_del_tag_ids)).delete(
+                synchronize_session=False)
             db.session.commit()
         for tag_id in need_add_tag_ids:
             PostTag.get_or_create(post_id=post_id, tag_id=tag_id)

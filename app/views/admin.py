@@ -55,10 +55,13 @@ def _post(post_id=None):
             msg = 'Post was successfully created.'
         form.published.data = form.published.data == 'on'
         tags = form.tags.data
+        content = form.content.data
         del form.tags
+        del form.content
         form.populate_obj(post)
         post.save()
         post.update_tags(tags)
+        post.set_content(content)
         posts = Post.query.all()
         total = len(posts)
         context = {'posts': posts, 'total': total, 'msg': msg}

@@ -3,7 +3,7 @@
 from flask_wtf import FlaskForm as _FlaskForm
 from wtforms import (
     StringField, PasswordField, SubmitField, BooleanField, SelectField,
-    SelectMultipleField
+    SelectMultipleField, TextAreaField
 )
 from wtforms.compat import iteritems
 from wtforms.validators import DataRequired
@@ -58,6 +58,7 @@ class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     slug = StringField('Slug')
     summary = StringField('Summary')
+    content = TextAreaField('Content', default='')
     can_comment = BooleanField('CanComment', default=True)
     tags = SelectMultipleField('Tags', default=[])
     author_id = SelectField('AuthorId', default='',
