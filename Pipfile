@@ -12,6 +12,7 @@ pymysql = "*"
 flask-login = "*"
 flask-wtf = "*"
 redis = "*"
+libmc = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import or_
-
 from app import db
 from app.models.base import BaseModel
+from .mc import cache, clear_mc
+
+MC_KEY_TAGS_BY_POST_ID = 'post:%s:tags'
 
 
 class Post(BaseModel):
@@ -32,6 +33,7 @@ class Post(BaseModel):
         return True
 
     @property
+    @cache(MC_KEY_TAGS_BY_POST_ID % ('{self.id}'))
     def tags(self):
         pts = PostTag.query.filter_by(post_id=self.id).all()
         if not pts:
@@ -58,7 +60,9 @@ class Post(BaseModel):
 
     @property
     def content(self):
-        return self.get_props_by_key('content').decode('utf-8')
+        rv = self.get_props_by_key('content')
+        if rv:
+            return rv.decode('utf-8')
 
 
 class Tag(BaseModel):
@@ -106,3 +110,5 @@ class PostTag(BaseModel):
             db.session.commit()
         for tag_id in need_add_tag_ids:
             PostTag.get_or_create(post_id=post_id, tag_id=tag_id)
+
+        clear_mc(MC_KEY_TAGS_BY_POST_ID % post_id)

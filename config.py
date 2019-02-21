@@ -15,7 +15,7 @@ class DevelopmentConfig(Config):
     SECRET_KEY = 'a random string'
     REDIS_HOST = 'localhost'
     REDIS_PORT = 6379
-
+    MEMCACHED_URL = ['127.0.0.1:11211']
 
 
 class ProductionConfig(Config):

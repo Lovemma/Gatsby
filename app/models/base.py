@@ -2,10 +2,7 @@
 
 from datetime import datetime
 
-import redis
-from flask import current_app
-
-from app import db
+from app import db, context
 
 
 class BaseModel(db.Model):
@@ -44,11 +41,8 @@ class BaseModel(db.Model):
     @property
     def redis(self):
         if self._redis is None:
-            host = current_app.config.get('REDIS_HOST', 'localhost')
-            port = current_app.config.get('REDIS_PORT', 6379)
-            pool = redis.ConnectionPool(host=host, port=port,
-                                        max_connections=10)
-            self._redis = redis.Redis(connection_pool=pool)
+            redis = context.get('redis')
+            self._redis = redis
         return self._redis
 
     def get_db_key(self, key):

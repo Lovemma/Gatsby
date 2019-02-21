@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import redis
 from flask import Flask, Request as _Request
 from flask_login import LoginManager, current_user
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.local import LocalProxy, LocalStack
+from werkzeug.contrib.cache import MemcachedCache
 
 from config import config
 
@@ -10,6 +13,19 @@ _app = Flask(__name__)
 db = SQLAlchemy()
 auth = LoginManager()
 auth.login_view = 'index.login'
+
+_context_stack = LocalStack()
+
+
+def get_context():
+    top = _context_stack.top
+    if top is None:
+        raise RuntimeError()
+    return top
+
+
+context = LocalProxy(get_context)
+client = None
 
 
 class Request(_Request):
@@ -42,6 +58,32 @@ def register_blueprint(app):
     app.register_blueprint(index_bp)
     from app.views.api import bp as api_bp
     app.register_blueprint(api_bp)
+
+
+@_app.before_first_request
+def setup():
+    global client
+    client = MemcachedCache(servers=_app.config.get('MEMCACHED_URL'))
+
+
+@_app.before_request
+def setup_context():
+    host = _app.config.get('REDIS_HOST', 'localhost')
+    port = _app.config.get('REDIS_PORT', 6379)
+    pool = redis.ConnectionPool(host=host, port=port,
+                                max_connections=10)
+    _redis = redis.Redis(connection_pool=pool)
+    context = {
+        'redis': _redis,
+        'memcached': client
+    }
+    _context_stack.push(context)
+
+
+@_app.after_request
+def teardown(response):
+    _context_stack.pop()
+    return response
 
 
 from .filters import has_attr
