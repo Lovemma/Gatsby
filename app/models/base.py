@@ -11,7 +11,7 @@ class BaseModel(db.Model):
     _redis = None
 
     id = db.Column(db.Integer, primary_key=True)
-    create_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     @classmethod
     def create(cls, **kwargs):
