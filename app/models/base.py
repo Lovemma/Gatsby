@@ -24,6 +24,7 @@ class BaseModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    @property
     def url(self):
         return f'/{self.__class__.__name__.lower()}/{self.id}/'
 

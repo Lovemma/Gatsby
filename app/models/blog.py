@@ -1,10 +1,31 @@
 # -*- coding: utf-8 -*-
 
+from html.parser import HTMLParser
+
+import mistune
+
 from app import db
 from app.models.base import BaseModel
 from .mc import cache, clear_mc
+from .utils import trunc_utf8
 
 MC_KEY_TAGS_BY_POST_ID = 'post:%s:tags'
+markdown = mistune.Markdown()
+
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.strict = False
+        self.convert_charrefs = True
+        self.fed = []
+
+    def handle_data(self, d):
+        self.fed.append(d)
+
+    def get_data(self):
+        return ''.join(self.fed)
 
 
 class Post(BaseModel):
@@ -63,6 +84,21 @@ class Post(BaseModel):
         rv = self.get_props_by_key('content')
         if rv:
             return rv.decode('utf-8')
+
+    @property
+    def html_content(self):
+        content = self.content
+        if not content:
+            return ''
+        return markdown(content)
+
+    @property
+    def excerpt(self):
+        if self.summary:
+            return self.summary
+        s = MLStripper()
+        s.feed(self.html_content)
+        return trunc_utf8(s.get_data(), 100)
 
 
 class Tag(BaseModel):
