@@ -27,7 +27,8 @@
     "codemirror": "^5.42.0",
     "file-loader": "^2.0.0",
     "marked": "^0.5.2",
-    "select2": "^4.0.5"
+    "select2": "^4.0.5",
+    "codemirror-spell-checker": "^1.1.2"
   },
   "dependencies": {
     "uikit": "^3.0.3",

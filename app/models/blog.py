@@ -31,12 +31,17 @@ class MLStripper(HTMLParser):
 class Post(BaseModel):
     __tablename__ = 'posts'
 
+    STATUSES = (
+        STATUS_UNPUBLISHED,
+        STATUS_ONLINE
+    ) = [False, True]
+
     title = db.Column(db.String(length=100), unique=True)
     author_id = db.Column(db.Integer)
     slug = db.Column(db.String(length=100))
     summary = db.Column(db.String(length=255))
     can_comment = db.Column(db.Boolean, default=True)
-    published = db.Column(db.Boolean, default=False)
+    published = db.Column(db.Boolean, default=STATUSES)
 
     @classmethod
     def create(cls, **kwargs):

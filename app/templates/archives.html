@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="post page archives">
+    {% for year, posts in archives %}
+        <h3 class="archive-year-wrap">
+            <a href="{{ url_for('blog.archive', year=year) }}"
+               class="archive-year">
+                {{ year }}
+            </a>
+        </h3>
+
+        <div class="archives">
+            {% for post in posts %}
+                <div class="archive">
+                    <a class="post-go" href="{{ post.url }}">
+                        <div>
+          <span class="date">
+            {{ post.created_at.strftime('%m-%d') }}
+          </span>
+                            <span class="slash">/</span>
+                            {{ post.title }}
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+
+        </div>
+    {% endfor %}
+
+
+{% endblock %}
+
+{% block pagination %}
+
+{% endblock %}

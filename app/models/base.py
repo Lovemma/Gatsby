@@ -3,6 +3,9 @@
 from datetime import datetime
 
 from app import db, context
+from .mc import cache, clear_mc
+
+MC_KEY_ITEM_BY_ID = '%s:%s'
 
 
 class BaseModel(db.Model):
@@ -18,11 +21,13 @@ class BaseModel(db.Model):
         instance = cls(**kwargs)
         db.session.add(instance)
         db.session.commit()
+        clear_mc(MC_KEY_ITEM_BY_ID % (instance.__class__.__name__, instance.id))
         return instance
 
     def save(self):
         db.session.add(self)
         db.session.commit()
+        clear_mc(MC_KEY_ITEM_BY_ID % (self.__class__.__name__, self.id))
 
     @property
     def url(self):
@@ -38,6 +43,7 @@ class BaseModel(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+        clear_mc(MC_KEY_ITEM_BY_ID % (self.__class__.__name__, self.id))
 
     @property
     def redis(self):
@@ -56,3 +62,12 @@ class BaseModel(db.Model):
     def get_props_by_key(self, key):
         key = self.get_db_key(key)
         return self.redis.get(key) or b''
+
+    @classmethod
+    @cache(MC_KEY_ITEM_BY_ID % ('{cls.__name__}', '{id}'))
+    def cache(cls, id):
+        return cls.query.get(id)
+
+    @classmethod
+    def get_multi(cls, ids):
+        return [cls.cache(id) for id in ids]

@@ -25,18 +25,15 @@
         </a>
 
         <ul class="pure-menu-list clearfix">
-            <li class="pure-menu-item"><a href="/" class="pure-menu-link">首页</a>
-            </li>
-            <li class="pure-menu-item"><a href="/archives"
-                                          class="pure-menu-link">归档</a></li>
-            <li class="pure-menu-item"><a href="/tags"
-                                          class="pure-menu-link">标签</a></li>
-            <li class="pure-menu-item"><a href="/search" class="pure-menu-link">搜索</a>
-            </li>
+            {% for endpoint, name in (('index', '首页'), ('archives', '归档'), ('tags', '标签'), ('search', '搜索'), ('atom', '订阅')) %}
+                {% set url = url_for('blog.{}'.format(endpoint)) %}
+                <li class="pure-menu-item {{ 'actived' if request.path == url else '' }}">
+                    <a href="{{ url }}" class="pure-menu-link">{{ name }}</a>
+                </li>
+            {% endfor %}
+
             <li class="pure-menu-item"><a href="/page/aboutme"
                                           class="pure-menu-link">关于</a></li>
-            <li class="pure-menu-item"><a href="/atom.xml"
-                                          class="pure-menu-link">订阅</a></li>
         </ul>
     </nav>
 </div>
@@ -57,7 +54,8 @@
         <a class="bottom-item" href="https://github.com/Lovemma/Gatsby"
            target="_blank">GitHub</a> |
         Powered by
-        <a class="href-item" href="https://github.com/pallets/flask" target="_blank">Flask</a>
+        <a class="href-item" href="https://github.com/pallets/flask"
+           target="_blank">Flask</a>
         And other Flask extensions
     </div>
 </footer>

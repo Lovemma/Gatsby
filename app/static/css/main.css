@@ -1218,3 +1218,7 @@ code {
 #content-outer {
     min-height: 500px;
 }
+
+footer .href-item:hover {
+    color: #2196F3;
+}
