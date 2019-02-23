@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from collections import Counter
 from itertools import groupby
 
 from flask import Blueprint, render_template
-from sqlalchemy import or_
 
-from app.models import Post
+from app.models import Post, PostTag, Tag
 
 bp = Blueprint('blog', __name__, url_prefix='/')
 
@@ -47,12 +47,22 @@ def archive(year):
 
 @bp.route('/tags')
 def tags():
-    return render_template('tags.html')
+    tag_ids = PostTag.query.with_entities(PostTag.tag_id).all()
+    counter = Counter(tag_ids)
+    tags_ = Tag.get_multi(counter.keys())
+    tags = [(tags_[index], count)
+            for index, count in enumerate(counter.values())]
+
+    return render_template('tags.html', tags=tags)
 
 
-@bp.route('/tag/<tag_id>')
+@bp.route('/tag/<int:tag_id>/')
 def tag(tag_id):
-    return render_template('tag.html')
+    tag = Tag.cache(tag_id)
+    post_ids = PostTag.query.filter_by(tag_id=tag_id).order_by(
+        PostTag.post_id.desc()).with_entities(PostTag.post_id).all()
+    posts = Post.get_multi(post_ids)
+    return render_template('tag.html', tag=tag, posts=posts)
 
 
 @bp.route('/search')
