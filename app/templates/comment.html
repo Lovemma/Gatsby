@@ -1,0 +1,123 @@
+{% macro render_comments(comments, github_user) %}
+    {% for comment in comments %}
+        <li class="gitment-comment">
+            <a class="gitment-comment-avatar"
+               href="https://github.com/imsun" target="_blank">
+                <img class="gitment-comment-avatar-img"
+                     src="https://avatars3.githubusercontent.com/u/5890751?v=4">
+            </a>
+            <a class="gitment-comment-avatar"
+               style="background-color: '#eee';">
+                {{ comment.user.get_first_character() if comment.user else '' }}
+            </a>
+            <div class="gitment-comment-main">
+                <div class="gitment-comment-header">
+                    <a class="gitment-comment-name"
+                       href="{{ comment.user.url() if comment.user else '#' }}"
+                       target="_blank">
+                        {{ comment.user.name if comment.user else '[已注销]' }}
+                    </a>
+                    commented on
+                    <span title="{{ comment.created_at }}">{{ comment.created_at.strftime('%a %B %d, %Y') }}</span>
+                    {% if comment.updated_at %}
+                        • <span
+                            title="comment was edited at {{ comment.updated_at }}">已编辑</span>
+                    {% endif %}
+                    {% if github_user %}
+                        <div class="gitment-comment-like-btn {{ 'liked' if github_user.id == comment.user_id else '' }}"
+                             data-id={{ comment.id }}>
+                            <svg class="gitment-heart-icon"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 50 50">
+                                <path d="M25 39.7l-.6-.5C11.5 28.7 8 25 8 19c0-5 4-9 9-9 4.1 0 6.4 2.3 8 4.1 1.6-1.8 3.9-4.1 8-4.1 5 0 9 4 9 9 0 6-3.5 9.7-16.4 20.2l-.6.5zM17 12c-3.9 0-7 3.1-7 7 0 5.1 3.2 8.5 15 18.1 11.8-9.6 15-13 15-18.1 0-3.9-3.1-7-7-7-3.5 0-5.4 2.1-6.9 3.8L25 17.1l-1.1-1.3C22.4 14.1 20.5 12 17 12z"></path>
+                            </svg>
+                            <span>{{ comment.n_likes or '' }}</span></div>
+                    {% endif %}
+                </div>
+                <div class="gitment-comment-body gitment-markdown">{{ comment.html_content }}
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+
+{% endmacro %}
+
+
+
+{% macro render_container(comments, n_comments, comment_per_page, github_user=None) %}
+    <div class="gitment-container gitment-root-container">
+        <div class="gitment-container gitment-comments-container">
+            {% if comments %}
+                <ul class="gitment-comments-list">
+                    {{ render_comments(comments, github_user) }}
+                </ul>
+
+                <ul class="gitment-comments-pagination">
+                    <li class="gitment-comments-page-item gitment-hidden prev">
+                        Previous
+                    </li>
+                    {% set n_pages = n_comments//comment_per_page %}
+                    {% for page in range(n_pages if not n_comments % comment_per_page else (n_pages + 1)) %}
+                        <li class="gitment-comments-page-item {{ 'gitment-selected' if not page else '' }}">
+                            {{ page + 1 }}
+                        </li>
+                    {% endfor %}
+
+                    <li class="gitment-comments-page-item {{ 'gitment-hidden' if n_comments <= comment_per_page else '' }} next">
+                        Next
+                    </li>
+                </ul>
+            {% else %}
+                <div class="gitment-comments-empty">还没有评论</div>
+            {% endif %}
+        </div>
+        <div class="gitment-container gitment-editor-container">
+            <a class="gitment-editor-avatar"
+               href="https://github.com/Lovemma" target="_blank">
+                <img class="gitment-editor-avatar-img"
+                     src="https://avatars0.githubusercontent.com/u/24970507?v=4">
+            </a>
+
+            <div class="gitment-editor-main">
+                <div class="gitment-editor-header">
+                    <nav class="gitment-editor-tabs">
+                        <button class="gitment-editor-tab write gitment-selected">
+                            输入
+                        </button>
+                        <button class="gitment-editor-tab preview">预览
+                        </button>
+                    </nav>
+                    <div class="gitment-editor-login">
+                        {% if not github_user %}
+                            <a class="gitment-editor-login-link">登录</a>
+                        {% else %}
+                            <a class="gitment-editor-logout-link">${github_user.name}</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="gitment-editor-body">
+                    <div class="gitment-editor-write-field">
+          <textarea placeholder="评价一下吧" title=""
+                  {% if not github_user %}
+                    disabled
+                  {% endif %}></textarea>
+                    </div>
+                    <div class="gitment-editor-preview-field gitment-hidden">
+                        <div class="gitment-editor-preview gitment-markdown">
+                            空空如也
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gitment-editor-footer">
+                <a class="gitment-editor-footer-tip"
+                   href="https://guides.github.com/features/mastering-markdown/"
+                   target="_blank">
+                    支持 Markdown 语法
+                </a>
+                <button class="gitment-editor-submit" title="">评论</button>
+            </div>
+        </div>
+    </div>
+
+{% endmacro %}

@@ -17,10 +17,11 @@ def index():
     return render_template('index.html', posts=posts)
 
 
-@bp.route('/post/<post_id>')
+@bp.route('/post/<post_id>/')
 def post(post_id):
-    post = Post.query.get(post_id).first_or_404()
-    return render_template('index.html', post=post)
+    post = Post.query.get_or_404(post_id)
+    github_user = None
+    return render_template('post.html', post=post, github_user=github_user)
 
 
 @bp.route('/archives')

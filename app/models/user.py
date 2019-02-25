@@ -48,3 +48,24 @@ def validate_login(name, password):
 @auth.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
+
+
+class GithubUser(BaseModel):
+    __tablename__ = 'github_users'
+
+    gid = db.Column(db.Integer, unique=True)
+    email = db.Column(db.String(100), unique=True)
+    username = db.Column(db.String(100), unique=True)
+    picture = db.Column(db.String(100), default='')
+
+    def to_dict(self):
+        return {key: value for key, value in self.__dict__.items()
+                if not key.startswith('_')}
+
+
+def create_github_user(user_info):
+    user, _ = GithubUser.get_or_create(
+        gid=user_info.get('id'), email=user_info.get('email'),
+        username=user_info.get('name'), picture=user_info.get('avatar_url')
+    )
+    return user

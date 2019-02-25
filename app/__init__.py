@@ -4,8 +4,8 @@ import redis
 from flask import Flask, Request as _Request
 from flask_login import LoginManager, current_user
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.local import LocalProxy, LocalStack
 from werkzeug.contrib.cache import MemcachedCache
+from werkzeug.local import LocalProxy, LocalStack
 
 from config import config
 

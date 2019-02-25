@@ -16,6 +16,9 @@ class DevelopmentConfig(Config):
     REDIS_HOST = 'localhost'
     REDIS_PORT = 6379
     MEMCACHED_URL = ['127.0.0.1:11211']
+    GITHUB_CLIENT_ID = ''
+    GITHUB_CLIENT_SECRET = ''
+    REDIRECT_URL = 'http://127.0.0.1/oauth'
 
 
 class ProductionConfig(Config):

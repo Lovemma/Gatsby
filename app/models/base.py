@@ -21,7 +21,7 @@ class BaseModel(db.Model):
         instance = cls(**kwargs)
         db.session.add(instance)
         db.session.commit()
-        clear_mc(MC_KEY_ITEM_BY_ID % (instance.__class__.__name__, instance.id))
+        clear_mc(MC_KEY_ITEM_BY_ID % (cls.__class__.__name__, instance.id))
         return instance
 
     def save(self):
