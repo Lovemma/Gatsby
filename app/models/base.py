@@ -16,34 +16,9 @@ class BaseModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    @classmethod
-    def create(cls, **kwargs):
-        instance = cls(**kwargs)
-        db.session.add(instance)
-        db.session.commit()
-        clear_mc(MC_KEY_ITEM_BY_ID % (cls.__class__.__name__, instance.id))
-        return instance
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-        clear_mc(MC_KEY_ITEM_BY_ID % (self.__class__.__name__, self.id))
-
     @property
     def url(self):
         return f'/{self.__class__.__name__.lower()}/{self.id}/'
-
-    @classmethod
-    def get_or_create(cls, **kwargs):
-        instance = cls.query.filter_by(**kwargs).first()
-        if instance:
-            return instance, False
-        return cls.create(**kwargs), True
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        clear_mc(MC_KEY_ITEM_BY_ID % (self.__class__.__name__, self.id))
 
     @property
     def redis(self):
@@ -51,6 +26,13 @@ class BaseModel(db.Model):
             redis = context.get('redis')
             self._redis = redis
         return self._redis
+
+    @classmethod
+    def get_or_create(cls, **kwargs):
+        instance = cls.query.filter_by(**kwargs).first()
+        if instance:
+            return instance, False
+        return cls.create(**kwargs), True
 
     def get_db_key(self, key):
         return f'{self.__class__.__name__}/{self.id}/props/{key}'
@@ -71,3 +53,28 @@ class BaseModel(db.Model):
     @classmethod
     def get_multi(cls, ids):
         return [cls.cache(id) for id in ids]
+
+    @classmethod
+    def create(cls, **kwargs):
+        instance = cls(**kwargs)
+        db.session.add(instance)
+        db.session.commit()
+        cls.__flush__(instance)
+        return instance
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        self.__flush__(self)
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        self.__flush__(self)
+
+    @classmethod
+    def __flush__(cls, target):
+        clear_mc(MC_KEY_ITEM_BY_ID % (target.__class__.__name__, target.id))
+
+    def clear_mc(self):
+        ...

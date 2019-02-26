@@ -6,6 +6,7 @@ import mistune
 
 from app import db
 from app.models.base import BaseModel
+from .comment import CommentMixin
 from .mc import cache, clear_mc
 from .utils import trunc_utf8
 
@@ -28,7 +29,7 @@ class MLStripper(HTMLParser):
         return ''.join(self.fed)
 
 
-class Post(BaseModel):
+class Post(BaseModel, CommentMixin):
     __tablename__ = 'posts'
 
     STATUSES = (

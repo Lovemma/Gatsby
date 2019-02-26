@@ -24,7 +24,7 @@ def login():
         is_validated, user = validate_login(name, password)
         if is_validated:
             login_user(user)
-            return redirect('/')
+            return redirect(url_for('admin.index'))
         error = 'Validation failed. Please try again'
     return render_template('admin/login_user.html', request=request,
                            form=form, error=error)
