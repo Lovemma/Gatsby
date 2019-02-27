@@ -29,7 +29,7 @@ class MLStripper(HTMLParser):
         return ''.join(self.fed)
 
 
-class Post(BaseModel, CommentMixin):
+class Post(CommentMixin, BaseModel):
     __tablename__ = 'posts'
 
     STATUSES = (

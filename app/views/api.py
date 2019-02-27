@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, json, abort, request
+from flask import Blueprint, jsonify, abort, request
 from flask_login import login_required
 
 from app.models import Post
@@ -15,13 +15,13 @@ def publish(post_id):
         abort(404)
     post = Post.query.get(post_id)
     if not post:
-        return json.dumps({'r': 1, 'msg': 'Post not exist'})
+        return jsonify({'r': 1, 'msg': 'Post not exist'})
     if request.method == 'POST':
         post.published = True
     elif request.method == 'DELETE':
         post.published = False
     post.save()
-    return json.dumps({'r': 0})
+    return jsonify({'r': 0})
 
 
 @bp.route('/delete/<post_id>', methods=['DELETE'])
@@ -31,6 +31,6 @@ def delete(post_id):
         abort(404)
     post = Post.query.get(post_id)
     if not post:
-        return json.dumps({'r': 1, 'msg': 'Post not exist'})
+        return jsonify({'r': 1, 'msg': 'Post not exist'})
     post.delete()
-    return json.dumps({'r': 0})
+    return jsonify({'r': 0})

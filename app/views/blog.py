@@ -3,7 +3,7 @@
 from collections import Counter
 from itertools import groupby
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, session
 
 from app.models import Post, PostTag, Tag
 
@@ -20,7 +20,7 @@ def index():
 @bp.route('/post/<post_id>/')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    github_user = None
+    github_user = session.get('user')
     return render_template('post.html', post=post, github_user=github_user)
 
 

@@ -57,6 +57,7 @@ class GithubUser(BaseModel):
     email = db.Column(db.String(100), unique=True)
     username = db.Column(db.String(100), unique=True)
     picture = db.Column(db.String(100), default='')
+    link = db.Column(db.String(100), default='')
 
     def to_dict(self):
         return {key: value for key, value in self.__dict__.items()

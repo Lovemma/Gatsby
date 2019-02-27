@@ -18,7 +18,7 @@ class DevelopmentConfig(Config):
     MEMCACHED_URL = ['127.0.0.1:11211']
     GITHUB_CLIENT_ID = ''
     GITHUB_CLIENT_SECRET = ''
-    REDIRECT_URL = 'http://127.0.0.1/oauth'
+    REDIRECT_URL = 'http://127.0.0.1:8000/oauth'
 
 
 class ProductionConfig(Config):

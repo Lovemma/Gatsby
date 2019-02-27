@@ -38,12 +38,13 @@ def logout():
 
 
 @bp.route('/oauth')
-@bp.route('/oauth/<post_id>')
+@bp.route('/oauth/post/<post_id>')
 def oauth(post_id=None):
     if post_id is None:
         url = '/'
     else:
         url = url_for('blog.post', post_id=post_id)
+
     user = session.get('user')
     if user:
         return redirect(url)
@@ -61,7 +62,7 @@ def oauth(post_id=None):
 
     redirect_url = current_app.config.get('REDIRECT_URL')
     if post_id is not None:
-        redirect_url += f'/{post_id}'
+        redirect_url += f'/post/{post_id}'
 
     if 'code' not in request.args:
         return redirect(github.get_authorize_url(

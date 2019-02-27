@@ -60,6 +60,8 @@ def register_blueprint(app):
     app.register_blueprint(api_bp)
     from app.views.blog import bp as blog_bp
     app.register_blueprint(blog_bp)
+    from app.views.j import bp as j_bp
+    app.register_blueprint(j_bp)
 
 
 @_app.before_first_request

@@ -5,6 +5,7 @@
 {% block more_head %}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/gitment.css') }} ">
+    <meta name="post_id" content="{{ post.id }}">
 {% endblock %}
 
 {% block content %}
@@ -43,7 +44,8 @@
         </article>
         <div class="toc-container"></div>
     </div>
-    {{ comment.render_container([], 8, 10, github_user) }}
+
+    {{ comment.render_container(post, 10, github_user) }}
 
     <div class="copyright">
         <span>本作品采用</span>
@@ -58,4 +60,8 @@
 
 {% block pagination %}
 
+{% endblock %}
+
+{% block bottom_script %}
+    <script src="{{ url_for('static', filename='dist/blog/comment.js') }}"></script>
 {% endblock %}

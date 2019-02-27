@@ -5,6 +5,7 @@ import mistune
 from app import db
 from app.models.base import BaseModel
 from .mc import clear_mc, cache
+from .user import GithubUser
 
 markdown = mistune.Markdown()
 MC_KEY_COMMENT_LIST = 'comment:%s:comment_list'
@@ -32,6 +33,10 @@ class Comment(BaseModel):
             return ''
         return markdown(content)
 
+    @property
+    def user(self):
+        return GithubUser.query.filter_by(gid=self.github_id).first()
+
     def set_content(self, content):
         return self.set_props_by_key('content', content)
 
@@ -51,7 +56,7 @@ class CommentMixin:
         obj = Comment.create(github_id=user_id, post_id=self.id,
                              ref_id=ref_id)
         obj.set_content(content)
-        return True
+        return obj
 
     def del_comment(self, user_id, comment_id):
         c = Comment.query.get(comment_id)

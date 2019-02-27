@@ -12,9 +12,9 @@ pymysql = "*"
 flask-login = "*"
 flask-wtf = "*"
 redis = "*"
-libmc = "*"
 mistune = "*"
 rauth = "*"
+pylibmc = "*"
 
 [requires]
 python_version = "3.7"

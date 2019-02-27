@@ -4,7 +4,7 @@ const webpack = require('webpack');
 
 const config = {
     entry: glob.sync('./src/**/*.js').reduce(
-        (entries, entry) => Object.assign(entries, {[entry.split('/').pop().replace('.js', '')]: entry}), {}
+        (entries, entry) => Object.assign(entries, {[entry.split('/').splice(-2, 2).join('/').replace('.js', '')]: entry}), {}
     ),
 
     module: {
