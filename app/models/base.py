@@ -74,8 +74,8 @@ class BaseModel(db.Model):
 
     @classmethod
     def __flush__(cls, target):
-        # todo 清除缓存功能无效
         clear_mc(MC_KEY_ITEM_BY_ID % (target.__class__.__name__, target.id))
+        target.clear_mc()
 
     def clear_mc(self):
         ...
