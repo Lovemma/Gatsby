@@ -33,7 +33,7 @@ def create_comment(user, post_id):
         return jsonify({'r': 1, 'msg': 'Comment content required.'})
     comment = post.add_comment(user['gid'], content)
 
-    template = get_template_attribute('comment.html',
+    template = get_template_attribute('utils.html',
                                       'render_single_comment')
     return jsonify({
         'r': 0 if comment else 1,
@@ -54,7 +54,7 @@ def comments(post_id):
     comments = post.comments[start:start + per_page]
 
     user = session.get('user')
-    template = get_template_attribute('comment.html', 'render_comments')
+    template = get_template_attribute('utils.html', 'render_comments')
 
     return jsonify({
         'r': 0,

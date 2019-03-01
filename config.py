@@ -19,6 +19,7 @@ class DevelopmentConfig(Config):
     GITHUB_CLIENT_ID = ''
     GITHUB_CLIENT_SECRET = ''
     REDIRECT_URL = 'http://127.0.0.1:8000/oauth'
+    REACT_PROMPT = '喜欢这篇文章吗? 记得给我留言或订阅哦'
 
 
 class ProductionConfig(Config):

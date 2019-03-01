@@ -7,6 +7,7 @@ import mistune
 from app import db
 from app.models.base import BaseModel
 from .comment import CommentMixin
+from .consts import K_POST
 from .mc import cache, clear_mc
 from .utils import trunc_utf8
 
@@ -43,6 +44,7 @@ class Post(CommentMixin, BaseModel):
     summary = db.Column(db.String(length=255))
     can_comment = db.Column(db.Boolean, default=True)
     published = db.Column(db.Boolean, default=STATUSES)
+    kind = K_POST
 
     @classmethod
     def create(cls, **kwargs):

@@ -4,6 +4,7 @@ import mistune
 
 from app import db
 from app.models.base import BaseModel
+from .consts import K_COMMENT
 from .mc import clear_mc, cache
 from .user import GithubUser
 
@@ -19,6 +20,7 @@ class Comment(BaseModel):
     post_id = db.Column(db.Integer)
     reaction_type = db.Column(db.Integer)
     ref_id = db.Column(db.Integer)
+    kind = K_COMMENT
 
     @property
     def content(self):

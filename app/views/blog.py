@@ -5,7 +5,8 @@ from itertools import groupby
 
 from flask import Blueprint, render_template, session
 
-from app.models import Post, PostTag, Tag
+from app.models.consts import K_POST
+from app.models import Post, PostTag, Tag, ReactItem, ReactStats
 
 bp = Blueprint('blog', __name__, url_prefix='/')
 
@@ -21,7 +22,14 @@ def index():
 def post(post_id):
     post = Post.query.get_or_404(post_id)
     github_user = session.get('user')
-    return render_template('post.html', post=post, github_user=github_user)
+    stat = ReactStats.get_by_target(post_id, K_POST)
+    if github_user:
+        reaction_type = ReactItem.get_reaction_type(
+            github_user['id'], post_id, K_POST)
+    else:
+        reaction_type = None
+    return render_template('post.html', post=post, github_user=github_user,
+                           stat=stat, reaction_type=reaction_type)
 
 
 @bp.route('/archives')

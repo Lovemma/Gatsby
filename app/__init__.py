@@ -38,6 +38,14 @@ class Request(_Request):
         return self.user.id if self.user else 0
 
 
+def setup_jinja2_environment(app):
+    app.jinja_env.globals['REACT_PROMPT'] = app.config.get('REACT_PROMPT')
+    from .models import ReactItem
+    app.jinja_env.globals['ReactItem'] = ReactItem
+    from .models.consts import K_POST
+    app.jinja_env.globals['K_POST'] = K_POST
+
+
 def create_app(config_name='default'):
     _app.request_class = Request
     _app.config.from_object(config[config_name])
@@ -47,6 +55,7 @@ def create_app(config_name='default'):
     config[config_name].init_app(_app)
 
     register_blueprint(_app)
+    setup_jinja2_environment(_app)
 
     return _app
 
@@ -90,4 +99,4 @@ def teardown(response):
     return response
 
 
-from .filters import has_attr
+from .filters import has_attr, get_attr

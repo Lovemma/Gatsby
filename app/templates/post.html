@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
 
-{% import 'comment.html' as comment %}
+{% import 'utils.html' as utils %}
 
 {% block more_head %}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/gitment.css') }} ">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/react.css') }}">
     <meta name="post_id" content="{{ post.id }}">
 {% endblock %}
 
@@ -45,7 +47,9 @@
         <div class="toc-container"></div>
     </div>
 
-    {{ comment.render_container(post, 10, github_user) }}
+    {{ utils.render_react_container(stat, reaction_type) }}
+
+    {{ utils.render_comment_container(post, 10, github_user) }}
 
     <div class="copyright">
         <span>本作品采用</span>

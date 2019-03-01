@@ -101,7 +101,10 @@ def cache(key_pattern, expire=0):
                     r = dumps(r)
                     memcached.set(key.encode('utf-8'), r, expire)
 
-            r = loads(r)
+            try:
+                r = loads(r)
+            except TypeError:
+                pass
             if isinstance(r, Empty):
                 r = None
             return r
