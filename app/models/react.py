@@ -5,7 +5,7 @@ from app.models.base import BaseModel
 from .mc import cache, clear_mc
 
 MC_KEY_USER_REACT_STAT = 'react:stats:%s:%s'
-MC_KEY_REACTION_TYPE_BY_USER_TARGET = 'react:reaction_type:%s:%s:%s'
+MC_KEY_REACTION_ITEM_BY_USER_TARGET = 'react:reaction_item:%s:%s:%s'
 
 
 class ReactItem(BaseModel):
@@ -44,15 +44,15 @@ class ReactItem(BaseModel):
         return obj
 
     @classmethod
-    @cache(MC_KEY_REACTION_TYPE_BY_USER_TARGET % ('{user_id}', '{target_id}',
+    @cache(MC_KEY_REACTION_ITEM_BY_USER_TARGET % ('{user_id}', '{target_id}',
                                                   '{target_kind}'))
-    def get_reaction_type(cls, user_id, target_id, target_kind):
+    def get_reaction_item(cls, user_id, target_id, target_kind):
         rv = cls.query.filter_by(user_id=user_id, target_id=target_id,
                                  target_kind=target_kind).first()
-        return None if not rv else rv.reaction_type
+        return rv
 
     def clear_mc(self):
-        clear_mc(MC_KEY_REACTION_TYPE_BY_USER_TARGET % (
+        clear_mc(MC_KEY_REACTION_ITEM_BY_USER_TARGET % (
             self.user_id, self.target_id, self.target_kind))
 
 
@@ -78,3 +78,33 @@ class ReactStats(BaseModel):
     def clear_mc(self):
         clear_mc(MC_KEY_USER_REACT_STAT % (
             self.target_id, self.target_kind))
+
+
+class ReactMixin:
+    def add_reaction(self, user_id, reaction_type):
+        item = ReactItem.get_reaction_item(user_id, self.id, self.kind)
+        if item and reaction_type == item.reaction_type:
+            return True
+        if not item:
+            item = ReactItem.create(
+                target_id=self.id, target_kind=self.kind,
+                user_id=user_id, reaction_type=reaction_type)
+        else:
+            item.reaction_type = reaction_type
+            item.save()
+
+        return bool(item)
+
+    def cancel_reaction(self, user_id):
+        item = ReactItem.get_reaction_item(user_id, self.id, self.kind)
+        if item:
+            item.delete()
+        return True
+
+    @property
+    def stats(self):
+        return ReactStats.get_by_target(self.id, self.kind)
+
+    def get_reaction_type(self, user_id):
+        item = ReactItem.get_reaction_item(user_id, self.id, self.kind)
+        return item.reaction_type if item else None

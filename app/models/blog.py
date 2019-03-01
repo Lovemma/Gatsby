@@ -5,10 +5,11 @@ from html.parser import HTMLParser
 import mistune
 
 from app import db
-from app.models.base import BaseModel
+from .base import BaseModel
 from .comment import CommentMixin
 from .consts import K_POST
 from .mc import cache, clear_mc
+from .react import ReactMixin
 from .utils import trunc_utf8
 
 MC_KEY_TAGS_BY_POST_ID = 'post:%s:tags'
@@ -30,7 +31,7 @@ class MLStripper(HTMLParser):
         return ''.join(self.fed)
 
 
-class Post(CommentMixin, BaseModel):
+class Post(CommentMixin, ReactMixin, BaseModel):
     __tablename__ = 'posts'
 
     STATUSES = (

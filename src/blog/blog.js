@@ -7,6 +7,9 @@ let $editorPreviewField = $('.gitment-editor-preview-field');
 let $loginBtn = $('.gitment-editor-login-link');
 let $submitBtn = $('.gitment-editor-submit');
 let $pageItemBtn = $('.gitment-comments-page-item');
+let $reactionBtn = $('.reaction-item__button');
+let $reactionEnabled = $('.reaction-item__enabled') != null;
+let $reactionContainer = $('#reactions__container');
 
 const target_id = $('meta[name=post_id]').attr('content');
 
@@ -125,3 +128,24 @@ $submitBtn.click((e) => {
         }
     });
 });
+
+$reactionBtn.click((e) => {
+    let self = $(e.currentTarget);
+
+    $.ajax({
+        url: `/j/post/${target_id}/react`,
+        type: $reactionEnabled ? 'post' : 'delete',
+        data: {'reaction_type': self.data('kind')},
+        dataType: 'json',
+        success: function (rs) {
+            if (!rs.r) {
+                $reactionContainer.empty().append(rs.html)
+                $reactionEnabled = !$reactionEnabled
+                console.log('表态成功')
+            } else {
+                console.log('表态失败')
+            }
+        }
+    });
+});
+

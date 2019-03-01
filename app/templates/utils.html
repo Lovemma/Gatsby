@@ -133,33 +133,31 @@
     {% for name in ReactItem.REACTION_MAP %}
         {% set total = total + stat|getattr(name+'_count') %}
     {% endfor %}
-    <div id="reactions__container">
-        <div id="reactions">
-            <div class="text-bold align align--center">{{ REACT_PROMPT }}</div>
-            {% if total %}
-                <div class="spacing-top-small align align--center">{{ total }}
-                    表态
-                </div>
-            {% endif %}
-            <div class="reaction-items">
-                <div class="align align--center align--wrap">
-                    {% for name, kind in ReactItem.REACTION_MAP.items() %}
-                        <div class="reaction-item align align--column align--middle reaction-item__{{ 'enabled' if reaction_enable else 'disabled' }}">
-                            <div class="align align--middle reaction-item__button"
-                                 data-kind={{ kind }}>
-                                <img src="{{ url_for('static', filename='img/' + name + '.png') }}">
-                                <div class="reaction-item__text">{{ name.capitalize() }}
-                                </div>
+    <div id="reactions">
+        <div class="text-bold align align--center">{{ REACT_PROMPT }}</div>
+        {% if total %}
+            <div class="spacing-top-small align align--center">{{ total }}
+                表态
+            </div>
+        {% endif %}
+        <div class="reaction-items">
+            <div class="align align--center align--wrap">
+                {% for name, kind in ReactItem.REACTION_MAP.items() %}
+                    <div class="reaction-item align align--column align--middle reaction-item__{{ 'enabled' if reaction_enable else 'disabled' }}">
+                        <div class="align align--middle reaction-item__button"
+                             data-kind={{ kind }}>
+                            <img src="{{ url_for('static', filename='img/' + name + '.png') }}">
+                            <div class="reaction-item__text">{{ name.capitalize() }}
                             </div>
-                            {% if not reaction_enable %}
-                                <div class="reaction-item__votes">
-                                    {{ getattr(stat, name+'_count') }}
-                                </div>
-                            {% endif %}
                         </div>
-                    {% endfor %}
+                        {% if not reaction_enable %}
+                            <div class="reaction-item__votes">
+                                {{ stat|getattr(name+'_count') }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
 
-                </div>
             </div>
         </div>
     </div>

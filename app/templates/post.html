@@ -47,7 +47,9 @@
         <div class="toc-container"></div>
     </div>
 
-    {{ utils.render_react_container(stat, reaction_type) }}
+    <div id="reactions__container">
+        {{ utils.render_react_container(stat, reaction_type) }}
+    </div>
 
     {{ utils.render_comment_container(post, 10, github_user) }}
 
@@ -67,5 +69,5 @@
 {% endblock %}
 
 {% block bottom_script %}
-    <script src="{{ url_for('static', filename='dist/blog/comment.js') }}"></script>
+    <script src="{{ url_for('static', filename='dist/blog/blog.js') }}"></script>
 {% endblock %}

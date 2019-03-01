@@ -23,11 +23,12 @@ def post(post_id):
     post = Post.query.get_or_404(post_id)
     github_user = session.get('user')
     stat = ReactStats.get_by_target(post_id, K_POST)
+    reaction_type = None
     if github_user:
-        reaction_type = ReactItem.get_reaction_type(
+        reaction_item = ReactItem.get_reaction_item(
             github_user['id'], post_id, K_POST)
-    else:
-        reaction_type = None
+        if reaction_item:
+            reaction_type = reaction_item.reaction_type
     return render_template('post.html', post=post, github_user=github_user,
                            stat=stat, reaction_type=reaction_type)
 
