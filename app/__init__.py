@@ -26,6 +26,7 @@ def get_context():
 
 context = LocalProxy(get_context)
 client = None
+_redis = None
 
 
 class Request(_Request):
@@ -83,9 +84,11 @@ def setup():
 def setup_context():
     host = _app.config.get('REDIS_HOST', 'localhost')
     port = _app.config.get('REDIS_PORT', 6379)
-    pool = redis.ConnectionPool(host=host, port=port,
-                                max_connections=10)
-    _redis = redis.Redis(connection_pool=pool)
+    global _redis
+    if _redis is None:
+        pool = redis.ConnectionPool(host=host, port=port,
+                                    max_connections=10)
+        _redis = redis.Redis(connection_pool=pool)
     context = {
         'redis': _redis,
         'memcached': client
