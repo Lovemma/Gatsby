@@ -30,7 +30,7 @@ def login_required(f):
     return wrapped
 
 
-@bp.route('/comment/<post_id>', methods=['POST'])
+@bp.route('/post/<post_id>/comment', methods=['POST'])
 @login_required
 def create_comment(user, post):
     content = request.form.get('content')
@@ -48,7 +48,7 @@ def create_comment(user, post):
     })
 
 
-@bp.route('/comment/<post_id>/comments')
+@bp.route('/post/<post_id>/comments')
 def comments(post_id):
     post = Post.cache(post_id)
     if not post:

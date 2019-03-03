@@ -76,7 +76,7 @@ $pageItemBtn.click((e) => {
     loading.className = 'gitment-comments-loading';
     $commentContainer.empty().append(loading);
     $.ajax({
-        url: `/j/comment/${target_id}/comments?page=${page}&per_page=10`,
+        url: `/j/post/${target_id}/comments?page=${page}&per_page=10`,
         type: 'get',
         dataType: 'json',
         success: function (rs) {
@@ -110,7 +110,7 @@ $submitBtn.click((e) => {
     self.html('提交...');
     self.attr('disabled', true);
     $.ajax({
-        url: `/j/comment/${target_id}`,
+        url: `/j/post/${target_id}/comment`,
         type: 'post',
         data: {'content': content},
         dataType: 'json',
