@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import random
 from html.parser import HTMLParser
 
 import mistune
@@ -7,12 +8,14 @@ import mistune
 from app import db
 from .base import BaseModel
 from .comment import CommentMixin
-from .consts import K_POST
+from .consts import K_POST, ONE_HOUR
 from .mc import cache, clear_mc
 from .react import ReactMixin
 from .utils import trunc_utf8
 
 MC_KEY_TAGS_BY_POST_ID = 'post:%s:tags'
+MC_KEY_RELATED = 'post:related_posts:%s'
+
 markdown = mistune.Markdown()
 
 
@@ -108,6 +111,28 @@ class Post(CommentMixin, ReactMixin, BaseModel):
         s = MLStripper()
         s.feed(self.html_content)
         return trunc_utf8(s.get_data(), 100)
+
+    @cache(MC_KEY_RELATED % ('{self.id}'), ONE_HOUR)
+    def get_related(self, limit=4):
+        tag_ids = [tag.id for tag in self.tags]
+        post_ids = set(PostTag.query.filter(
+            PostTag.post_id != self.id, PostTag.tag_id.in_(tag_ids))
+                       .with_entities(PostTag.post_id).all())
+
+        excluded_ids = (self.query.filter(Post.published != self.STATUS_ONLINE)
+                        .with_entities(Post.id).all())
+
+        post_ids -= set(excluded_ids)
+
+        try:
+            post_ids = random.sample(post_ids, limit)
+        except ValueError:
+            pass
+
+        return self.get_multi(post_ids)
+
+    def clear_mc(self):
+        clear_mc(MC_KEY_RELATED % self.id)
 
 
 class Tag(BaseModel):

@@ -32,9 +32,11 @@ def post(post_id):
             reaction_type = reaction_item.reaction_type
         liked_comment_ids = post.comment_ids_liked_by(
             github_user['gid'])
+    related_posts = post.get_related()
     return render_template('post.html', post=post, github_user=github_user,
                            stat=stat, reaction_type=reaction_type,
-                           liked_comment_ids=liked_comment_ids)
+                           liked_comment_ids=liked_comment_ids,
+                           related_posts=related_posts)
 
 
 @bp.route('/archives')

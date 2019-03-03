@@ -47,6 +47,15 @@
         <div class="toc-container"></div>
     </div>
 
+    <ul id="related">
+        {% for post in related_posts %}
+            <li>
+                <a href="{{ post.url }}"
+                   title="{{ post.title }}">{{ post.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
     <div id="reactions__container">
         {{ utils.render_react_container(stat, reaction_type) }}
     </div>

@@ -13,8 +13,7 @@ from .user import GithubUser
 markdown = mistune.Markdown()
 MC_KEY_COMMENT_LIST = 'comment:%s:comment_list'
 MC_KEY_N_COMMENTS = 'comment:%s:n_comments'
-MC_KEY_COMMNET_IDS_LIKED_BY_USER = 'react:comment_ids_liked_by:%s:%s:v2'
-
+MC_KEY_COMMENT_IDS_LIKED_BY_USER = 'react:comment_ids_liked_by:%s:%s'
 
 class Comment(ReactMixin, BaseModel):
     __tablename__ = 'comments'
@@ -85,7 +84,7 @@ class CommentMixin:
     def n_comments(self):
         return Comment.query.filter_by(post_id=self.id).count()
 
-    @cache(MC_KEY_COMMNET_IDS_LIKED_BY_USER % (
+    @cache(MC_KEY_COMMENT_IDS_LIKED_BY_USER % (
             '{user_id}', '{self.id}'), ONE_HOUR)
     def comment_ids_liked_by(self, user_id):
         cids = [c.id for c in self.comments]
@@ -102,5 +101,5 @@ def update_comment_list_cache(_, user_id, comment_id):
     comment = Comment.cache(comment_id)
     if comment:
         clear_mc(MC_KEY_COMMENT_LIST % comment.post_id)
-        clear_mc(MC_KEY_COMMNET_IDS_LIKED_BY_USER % (
+        clear_mc(MC_KEY_COMMENT_IDS_LIKED_BY_USER % (
             user_id, comment.post_id))
