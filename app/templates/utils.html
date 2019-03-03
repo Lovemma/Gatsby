@@ -1,4 +1,4 @@
-{% macro render_single_comment(comment, github_user) %}
+{% macro render_single_comment(comment, github_user, liked_comment_ids) %}
     {% set user = comment.user %}
     <li class="gitment-comment">
         <a class="gitment-comment-avatar"
@@ -16,14 +16,14 @@
                 commented on
                 <span title="{{ comment.created_at }}">{{ comment.created_at.strftime('%a %B %d, %Y') }}</span>
                 {% if github_user %}
-                    <div class="gitment-comment-like-btn {{ 'liked' if github_user['id'] == user.id else '' }}"
+                    <div class="gitment-comment-like-btn {{ 'liked' if comment.id in liked_comment_ids else '' }}"
                          data-id={{ comment.id }}>
                         <svg class="gitment-heart-icon"
                              xmlns="http://www.w3.org/2000/svg"
                              viewBox="0 0 50 50">
                             <path d="M25 39.7l-.6-.5C11.5 28.7 8 25 8 19c0-5 4-9 9-9 4.1 0 6.4 2.3 8 4.1 1.6-1.8 3.9-4.1 8-4.1 5 0 9 4 9 9 0 6-3.5 9.7-16.4 20.2l-.6.5zM17 12c-3.9 0-7 3.1-7 7 0 5.1 3.2 8.5 15 18.1 11.8-9.6 15-13 15-18.1 0-3.9-3.1-7-7-7-3.5 0-5.4 2.1-6.9 3.8L25 17.1l-1.1-1.3C22.4 14.1 20.5 12 17 12z"></path>
                         </svg>
-                        <span>0</span></div>
+                        <span>{{ comment.n_likes }}</span></div>
                 {% endif %}
             </div>
             <div class="gitment-comment-body gitment-markdown">{{ comment.html_content|safe }}
@@ -32,13 +32,13 @@
     </li>
 {% endmacro %}
 
-{% macro render_comments(comments, github_user) %}
+{% macro render_comments(comments, github_user, liked_comment_ids) %}
     {% for comment in comments %}
-        {{ render_single_comment(comment, github_user) }}
+        {{ render_single_comment(comment, github_user, liked_comment_ids) }}
     {% endfor %}
 {% endmacro %}
 
-{% macro render_comment_container(post, comment_per_page=10, github_user=None) %}
+{% macro render_comment_container(post, comment_per_page=10, github_user=None, liked_comment_ids=[]) %}
     {% set comments = post.comments[:comment_per_page] %}
     {% set n_comments = post.n_comments %}
     {% set post_id = post.id %}
@@ -46,7 +46,7 @@
         <div class="gitment-container gitment-comments-container">
             {% if comments %}
                 <ul class="gitment-comments-list">
-                    {{ render_comments(comments, github_user) }}
+                    {{ render_comments(comments, github_user, liked_comment_ids) }}
                 </ul>
 
                 <ul class="gitment-comments-pagination">
@@ -143,7 +143,7 @@
         <div class="reaction-items">
             <div class="align align--center align--wrap">
                 {% for name, kind in ReactItem.REACTION_MAP.items() %}
-                    <div class="reaction-item align align--column align--middle reaction-item__{{ 'enabled' if reaction_enable else 'disabled' }}">
+                    <div class="reaction-item align align--column align--middle reaction-item__{{ 'enabled' if reaction_enable else 'disabled' }} {{ 'reaction-item__selected' if kind == reaction_type else '' }}">
                         <div class="align align--middle reaction-item__button"
                              data-kind={{ kind }}>
                             <img src="{{ url_for('static', filename='img/' + name + '.png') }}">

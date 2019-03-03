@@ -2,7 +2,9 @@
 
 from app import db
 from app.models.base import BaseModel
+from .consts import K_COMMENT
 from .mc import cache, clear_mc
+from .signals import comment_reacted
 
 MC_KEY_USER_REACT_STAT = 'react:stats:%s:%s'
 MC_KEY_REACTION_ITEM_BY_USER_TARGET = 'react:reaction_item:%s:%s:%s'
@@ -51,9 +53,22 @@ class ReactItem(BaseModel):
                                  target_kind=target_kind).first()
         return rv
 
+    def delete(self):
+        super().delete()
+        stat = ReactStats.get_by_target(self.target_id, self.target_kind)
+        react_name = next((name for name, type in self.REACTION_MAP.items()
+                           if type == self.reaction_type), None)
+        field = f'{react_name}_count'
+        setattr(stat, field, getattr(stat, field) - 1)
+        stat.save()
+
     def clear_mc(self):
         clear_mc(MC_KEY_REACTION_ITEM_BY_USER_TARGET % (
             self.user_id, self.target_id, self.target_kind))
+
+        if self.target_kind == K_COMMENT:
+            comment_reacted.send(user_id=self.user_id,
+                                 comment_id=self.target_id)
 
 
 class ReactStats(BaseModel):
@@ -84,6 +99,7 @@ class ReactMixin:
     def add_reaction(self, user_id, reaction_type):
         item = ReactItem.get_reaction_item(user_id, self.id, self.kind)
         if item and reaction_type == item.reaction_type:
+            item.save()
             return True
         if not item:
             item = ReactItem.create(

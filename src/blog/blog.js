@@ -8,7 +8,6 @@ let $loginBtn = $('.gitment-editor-login-link');
 let $submitBtn = $('.gitment-editor-submit');
 let $pageItemBtn = $('.gitment-comments-page-item');
 let $reactionBtn = $('.reaction-item__button');
-let $reactionEnabled = $('.reaction-item__enabled') != null;
 let $reactionContainer = $('#reactions__container');
 
 const target_id = $('meta[name=post_id]').attr('content');
@@ -129,8 +128,13 @@ $submitBtn.click((e) => {
     });
 });
 
-$reactionBtn.click((e) => {
+$reactionBtn.on('click', (e) => {
     let self = $(e.currentTarget);
+    let $reactionEnabled = $('.reaction-item__enabled').length > 0;
+
+    if (!$reactionEnabled) {
+        return  // 目前只支持表态，不能取消
+    }
 
     $.ajax({
         url: `/j/post/${target_id}/react`,
@@ -144,6 +148,9 @@ $reactionBtn.click((e) => {
                 console.log('表态成功')
             } else {
                 console.log('表态失败')
+                if (rs.r == 403) {  // 未登录
+                    window.location.href = `/oauth/post/${target_id}`;
+                }
             }
         }
     });

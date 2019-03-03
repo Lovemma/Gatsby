@@ -5,7 +5,7 @@ from functools import wraps
 import mistune
 from flask import Blueprint, session, jsonify, request, get_template_attribute
 
-from app.models import Post, ReactItem, ReactStats
+from app.models import Post, ReactItem, ReactStats, Comment
 from app.models.consts import K_POST
 
 bp = Blueprint('j', __name__, url_prefix='/j')
@@ -19,7 +19,7 @@ def login_required(f):
             return jsonify({'r': 403, 'msg': 'Login required.'})
         post_id = kwargs.pop('post_id', None)
         if post_id is not None:
-            post = Post.query.get(post_id)
+            post = Post.cache(post_id)
             if not post:
                 return jsonify({'r': 1, 'msg': 'Post not exist.'})
             args = (user, post)
@@ -37,18 +37,20 @@ def create_comment(user, post):
     if not content:
         return jsonify({'r': 1, 'msg': 'Comment content required.'})
     comment = post.add_comment(user['gid'], content)
+    liked_comment_ids = post.comment_ids_liked_by(user['gid'])
 
     template = get_template_attribute('utils.html',
                                       'render_single_comment')
     return jsonify({
         'r': 0 if comment else 1,
-        'html': template(comment, user)
+        'html': template(comment, user),
+        'liked_comment_ids': liked_comment_ids
     })
 
 
 @bp.route('/comment/<post_id>/comments')
 def comments(post_id):
-    post = Post.query.get(post_id)
+    post = Post.cache(post_id)
     if not post:
         return jsonify({'r': 1, 'msg': 'Post not exist.'})
 
@@ -59,11 +61,13 @@ def comments(post_id):
     comments = post.comments[start:start + per_page]
 
     user = session.get('user')
+    liked_comment_ids = post.comment_ids_liked_by(user['gid'])
     template = get_template_attribute('utils.html', 'render_comments')
 
     return jsonify({
         'r': 0,
-        'html': template(comments, user)
+        'html': template(comments, user),
+        'liked_comment_ids': liked_comment_ids
     })
 
 
@@ -83,18 +87,34 @@ def react(user, post):
         reaction_type = request.form.get('reaction_type', None)
         if reaction_type is None:
             return jsonify({'r': 1, 'msg': 'Reaction type error.'})
-        rv = post.add_reaction(user['id'], reaction_type)
+        rv = post.add_reaction(user['gid'], reaction_type)
     elif request.method == 'DELETE':
-        rv = post.cancel_reaction(user['id'])
+        rv = post.cancel_reaction(user['gid'])
 
     stat = ReactStats.get_by_target(post.id, K_POST)
     reaction_type = None
     if user:
         reaction_item = ReactItem.get_reaction_item(
-            user['id'], post.id, K_POST)
+            user['gid'], post.id, K_POST)
         if reaction_item:
             reaction_type = reaction_item.reaction_type
     template = get_template_attribute('utils.html', 'render_react_container')
     return jsonify({'r': int(not rv),
                     'html': template(stat=stat, reaction_type=reaction_type)
                     })
+
+
+@bp.route('/comment/<comment_id>/like', methods=['POST', 'DELETE'])
+def comment_like(comment_id):
+    user = session.get('user')
+    if not user:
+        return jsonify({'r': 403, 'msg': 'Login required.'})
+    comment = Comment.cache(comment_id)
+    if not comment:
+        return jsonify({'r': 1, 'msg': 'Comment not exist.'})
+    if request.method == 'POST':
+        rv = comment.add_reaction(user['gid'], ReactItem.K_LOVE)
+    elif request.method == 'DELETE':
+        rv = comment.cancel_reaction(user['gid'])
+
+    return jsonify({'r': int(not rv), 'n_likes': comment.n_likes})

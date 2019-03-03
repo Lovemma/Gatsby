@@ -24,13 +24,17 @@ def post(post_id):
     github_user = session.get('user')
     stat = ReactStats.get_by_target(post_id, K_POST)
     reaction_type = None
+    liked_comment_ids = []
     if github_user:
         reaction_item = ReactItem.get_reaction_item(
             github_user['id'], post_id, K_POST)
         if reaction_item:
             reaction_type = reaction_item.reaction_type
+        liked_comment_ids = post.comment_ids_liked_by(
+            github_user['gid'])
     return render_template('post.html', post=post, github_user=github_user,
-                           stat=stat, reaction_type=reaction_type)
+                           stat=stat, reaction_type=reaction_type,
+                           liked_comment_ids=liked_comment_ids)
 
 
 @bp.route('/archives')
