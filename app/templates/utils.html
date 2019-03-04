@@ -144,7 +144,7 @@
             <div class="align align--center align--wrap">
                 {% for name, kind in ReactItem.REACTION_MAP.items() %}
                     <div class="reaction-item align align--column align--middle reaction-item__{{ 'enabled' if reaction_enable else 'disabled' }} {{ 'reaction-item__selected' if kind == reaction_type else '' }}">
-                        <div class="align align--middle reaction-item__button"
+                        <div class="align align--middle reaction-item-button"
                              data-kind={{ kind }}>
                             <img src="{{ url_for('static', filename='img/' + name + '.png') }}">
                             <div class="reaction-item__text">{{ name.capitalize() }}

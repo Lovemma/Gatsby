@@ -7,8 +7,8 @@ let $editorPreviewField = $('.gitment-editor-preview-field');
 let $loginBtn = $('.gitment-editor-login-link');
 let $submitBtn = $('.gitment-editor-submit');
 let $pageItemBtn = $('.gitment-comments-page-item');
-let $reactionBtn = $('.reaction-item__button');
-let $reactionContainer = $('#reactions__container');
+let $reactionBtn = $('.reaction-item-button');
+let $reactionContainer = $('#reactions-container');
 
 const target_id = $('meta[name=post_id]').attr('content');
 

@@ -75,4 +75,5 @@ class ProfileForm(FlaskForm):
     avatar_path = StringField('AvatarPath', default='')
     intro = StringField('Intro', default='')
     github_url = StringField('Github URL', default='')
+    linkedin_url = StringField('Linkedin URL', default='')
     submit = SubmitField('Submit')

@@ -5,8 +5,9 @@ from itertools import groupby
 
 from flask import Blueprint, render_template, session
 
-from app.models.consts import K_POST
 from app.models import Post, PostTag, Tag, ReactItem, ReactStats
+from app.models.consts import K_POST
+from app.models.profile import get_profile
 
 bp = Blueprint('blog', __name__, url_prefix='/')
 
@@ -14,8 +15,8 @@ bp = Blueprint('blog', __name__, url_prefix='/')
 @bp.route('/')
 def index():
     posts = Post.query.all()
-
-    return render_template('index.html', posts=posts)
+    profile = get_profile()
+    return render_template('index.html', posts=posts, profile=profile)
 
 
 @bp.route('/post/<post_id>/')

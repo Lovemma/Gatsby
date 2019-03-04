@@ -14,7 +14,8 @@ schema = {
     'properties': {
         'intro': {'type': 'string'},
         'github_url': {'type': 'string'},
-        'avatar': {'type': 'string'}
+        'avatar': {'type': 'string'},
+        'linkedin_url': {'type': 'string'}
     }
 }
 PROFILE_FILE = 'profile.json'

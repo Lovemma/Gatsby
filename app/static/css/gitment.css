@@ -1,5 +1,7 @@
 .gitment-container {
     font-size: 14px;
+    max-width: 880px;
+    margin: auto;
     line-height: 1.5;
     color: #333;
     word-wrap: break-word;
@@ -46,10 +48,6 @@
         -webkit-transform: rotate(360deg);
         transform: rotate(360deg)
     }
-}
-
-.gitment-root-container {
-    margin: 19px 0;
 }
 
 .gitment-header-container {

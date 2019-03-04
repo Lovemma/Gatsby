@@ -167,12 +167,15 @@ def profile():
             image = form.avatar.data
             intro = form.intro.data
             github_url = form.github_url.data
+            linkedin_url = form.linkedin_url.data
             avatar_path = secure_filename(image.filename)
             uploaded_file = Path(
                 current_app.config.get('UPLOAD_FOLDER')) / avatar_path
             image.save(str(uploaded_file))
             form.avatar_path.data = avatar_path
-            set_profile(intro=intro, avatar=avatar_path, github_url=github_url)
+            set_profile(intro=intro, avatar=avatar_path, github_url=github_url,
+                        linkedin_url=linkedin_url)
+
     elif request.method == 'GET':
         profile = get_profile()
         form.intro.data = profile.intro

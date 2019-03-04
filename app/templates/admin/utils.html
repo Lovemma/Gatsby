@@ -34,13 +34,17 @@
             {% elif field.type == 'TextAreaField' %}
                 <textarea name="{{ label_id }}" class="uk-textarea"></textarea>
             {% elif field.type == 'FileField' %}
-                <div class="js-upload">
+                <div class="js-upload uk-form-custom"
+                     uk-form-custom="target: true">
                     {% set form = kwargs.pop('form') %}
                     {% if form.avatar_path.data %}
-                        <img class="user-avatar"
+                        <img class="user-avatar" style="width: 100px"
                              src="{{ url_for('static', filename='upload/'+form.avatar_path.data|string) }}">
                     {% endif %}
                     <input type="file" name="{{ label_id }}">
+                    <button class="uk-button uk-button-default" type="button"
+                            tabindex="-1">Select
+                    </button>
                 </div>
             {% elif field.type == 'SelectMultipleField' %}
                 <select name="{{ label_id }}" multiple="multiple">
