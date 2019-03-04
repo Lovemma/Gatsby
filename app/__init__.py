@@ -10,6 +10,7 @@ from werkzeug.contrib.cache import MemcachedCache
 from werkzeug.local import LocalProxy, LocalStack
 
 from config import config
+from .utils import register_blueprint
 
 _app = Flask(__name__)
 db = SQLAlchemy()
@@ -57,23 +58,10 @@ def create_app(config_name='default'):
     auth.init_app(_app)
     config[config_name].init_app(_app)
 
-    register_blueprint(_app)
+    register_blueprint('app.views', _app)
     setup_jinja2_environment(_app)
 
     return _app
-
-
-def register_blueprint(app):
-    from app.views.admin import bp as admin_bp
-    app.register_blueprint(admin_bp)
-    from app.views.index import bp as index_bp
-    app.register_blueprint(index_bp)
-    from app.views.api import bp as api_bp
-    app.register_blueprint(api_bp)
-    from app.views.blog import bp as blog_bp
-    app.register_blueprint(blog_bp)
-    from app.views.j import bp as j_bp
-    app.register_blueprint(j_bp)
 
 
 @_app.before_first_request
