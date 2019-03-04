@@ -10,11 +10,9 @@ from .base import BaseModel
 class User(BaseModel, UserMixin):
     __tablename__ = 'users'
 
-    intro = db.Column(db.String(length=100), default='')
     email = db.Column(db.String(length=100))
     name = db.Column(db.String(length=100), unique=True)
     password = db.Column(db.Text)
-    github_url = db.Column(db.String(length=100), default='')
     active = db.Column(db.Boolean, default=True)
 
 

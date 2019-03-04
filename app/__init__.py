@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
+
 import redis
 from flask import Flask, Request as _Request
 from flask_login import LoginManager, current_user
@@ -78,6 +80,7 @@ def register_blueprint(app):
 def setup():
     global client
     client = MemcachedCache(servers=_app.config.get('MEMCACHED_URL'))
+    Path(_app.config.get('UPLOAD_FOLDER')).mkdir(parents=True, exist_ok=True)
 
 
 @_app.before_request

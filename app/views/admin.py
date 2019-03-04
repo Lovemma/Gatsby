@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+from pathlib import Path
 
-from flask import Blueprint, request, render_template
+from flask import Blueprint, request, render_template, current_app
 from flask_login import login_required
+from werkzeug.datastructures import CombinedMultiDict
+from werkzeug.utils import secure_filename
 
-from app.forms import UserForm, PostForm
+from app.forms import UserForm, PostForm, ProfileForm
 from app.models import Post, User, Tag
 from app.models.user import generate_password
+from app.models.profile import get_profile, set_profile
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -153,3 +157,26 @@ def _user(user_id=None):
 @login_required
 def edit_user(user_id):
     return _user(user_id)
+
+
+@bp.route('/profile', methods=['GET', 'POST'])
+def profile():
+    form = ProfileForm(CombinedMultiDict((request.files, request.form)))
+    if request.method == 'POST':
+        if form.validate():
+            image = form.avatar.data
+            intro = form.intro.data
+            github_url = form.github_url.data
+            avatar_path = secure_filename(image.filename)
+            uploaded_file = Path(
+                current_app.config.get('UPLOAD_FOLDER')) / avatar_path
+            image.save(str(uploaded_file))
+            form.avatar_path.data = avatar_path
+            set_profile(intro=intro, avatar=avatar_path, github_url=github_url)
+    elif request.method == 'GET':
+        profile = get_profile()
+        form.intro.data = profile.intro
+        form.github_url.data = profile.github_url
+        form.avatar_path.data = profile.avatar
+
+    return render_template('admin/profile.html', form=form)

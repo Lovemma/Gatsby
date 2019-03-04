@@ -108,3 +108,5 @@ venv.bak/
 .idea/
 Pipfile.lock
 /node_modules/
+/app/static/upload/
+/profile.json

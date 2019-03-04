@@ -16,6 +16,7 @@ mistune = "*"
 rauth = "*"
 pylibmc = "*"
 blinker = "*"
+jsonschema = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask_wtf import FlaskForm as _FlaskForm
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import (
     StringField, PasswordField, SubmitField, BooleanField, SelectField,
     SelectMultipleField, TextAreaField
@@ -65,4 +66,13 @@ class PostForm(FlaskForm):
                             validators=[DataRequired()])
     published = SwitchField('Published', choices=[('on', 1), ('off', 0)],
                             default='on')
+    submit = SubmitField('Submit')
+
+
+class ProfileForm(FlaskForm):
+    avatar = FileField('Avatar', validators=[
+        FileRequired(), FileAllowed('bmp gif jpg jpeg png'.split())])
+    avatar_path = StringField('AvatarPath', default='')
+    intro = StringField('Intro', default='')
+    github_url = StringField('Github URL', default='')
     submit = SubmitField('Submit')

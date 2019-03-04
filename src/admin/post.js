@@ -1,8 +1,5 @@
-import 'select2/dist/js/select2';
-import 'select2/dist/css/select2.css';
 import './admin';
-import UIkit from './base';
-import "../scss/select.scss";
+import './select';
 
 import SimpleMDE from '../vendor/simplemde';
 import '../css/font-awesome.min.css';
@@ -31,8 +28,3 @@ if ($content) {
     simplemde.value($content);
 }
 
-$(document).ready(() => {
-    $("select").select2({
-        tags: true
-    });
-});

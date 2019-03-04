@@ -1,0 +1,25 @@
+{% extends 'admin/base.html' %}
+
+{% import 'admin/utils.html' as utils %}
+
+{% block title %}
+    Settings
+{% endblock %}
+
+{% block content %}
+    <form class="uk-form-horizontal uk-margin-large settings-form"
+          action="{{ url_for('admin.profile') }}" method="POST"
+          name="settings_form" enctype="multipart/form-data">
+        <fieldset class="uk-fieldset">
+            {{ form.hidden_tag() }}
+            {{ utils.render_field_with_errors(form.avatar, form=form) }}
+            {{ utils.render_field_with_errors(form.intro) }}
+            {{ utils.render_field_with_errors(form.github_url) }}
+            {{ utils.render_submit(form.submit) }}
+        </fieldset>
+    </form>
+{% endblock %}
+
+{% block bottom_script %}
+    <script src="{{ url_for('static', filename='dist/admin/profile.js') }}"></script>
+{% endblock %}

@@ -62,3 +62,29 @@ def trunc_utf8(string, num, etc='...'):
     if etc:
         ret += etc
     return ret
+
+
+class Null:
+    def __call__(self, *args, **kwargs):
+        return self
+
+    def __getattr__(self, item):
+        return ''
+
+    def __setattr__(self, key, value):
+        return self
+
+    def __delattr__(self, item):
+        return self
+
+    def __repr__(self):
+        return '<Null>'
+
+    def __str__(self):
+        return 'Null'
+
+
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
