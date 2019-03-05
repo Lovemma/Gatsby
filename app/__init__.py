@@ -4,18 +4,15 @@ from pathlib import Path
 
 import redis
 from flask import Flask, Request as _Request
-from flask_login import LoginManager, current_user
-from flask_sqlalchemy import SQLAlchemy
+from flask_login import current_user
 from werkzeug.contrib.cache import MemcachedCache
 from werkzeug.local import LocalProxy, LocalStack
 
 from config import config
 from .utils import register_blueprint
+from .extenions import db, auth
 
 _app = Flask(__name__)
-db = SQLAlchemy()
-auth = LoginManager()
-auth.login_view = 'index.login'
 
 _context_stack = LocalStack()
 

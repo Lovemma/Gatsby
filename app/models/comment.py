@@ -2,7 +2,7 @@
 
 import mistune
 
-from app import db
+from app.extenions import db
 from app.models.base import BaseModel
 from .consts import K_COMMENT, ONE_HOUR
 from .mc import clear_mc, cache
@@ -14,6 +14,7 @@ markdown = mistune.Markdown()
 MC_KEY_COMMENT_LIST = 'comment:%s:comment_list'
 MC_KEY_N_COMMENTS = 'comment:%s:n_comments'
 MC_KEY_COMMENT_IDS_LIKED_BY_USER = 'react:comment_ids_liked_by:%s:%s'
+
 
 class Comment(ReactMixin, BaseModel):
     __tablename__ = 'comments'

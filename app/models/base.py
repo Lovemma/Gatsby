@@ -2,7 +2,8 @@
 
 from datetime import datetime
 
-from app import db, context
+from app import context
+from app.extenions import db
 from .mc import cache, clear_mc
 
 MC_KEY_ITEM_BY_ID = '%s:%s'

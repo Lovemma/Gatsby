@@ -3,7 +3,8 @@
 import click
 from sqlalchemy.exc import IntegrityError
 
-from app import db, create_app
+from app import create_app
+from app.extenions import db
 from app.models import create_user
 
 

@@ -5,7 +5,7 @@ from html.parser import HTMLParser
 
 import mistune
 
-from app import db
+from app.extenions import db
 from .base import BaseModel
 from .comment import CommentMixin
 from .consts import K_POST, ONE_HOUR
