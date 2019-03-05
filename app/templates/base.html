@@ -25,8 +25,8 @@
         </a>
 
         <ul class="pure-menu-list clearfix">
-            {% for endpoint, name in (('index', '首页'), ('archives', '归档'), ('tags', '标签'), ('search', '搜索'), ('atom', '订阅')) %}
-                {% set url = url_for('blog.{}'.format(endpoint)) %}
+            {% for endpoint, name in SITE_NAV_MENUS %}
+                {% set url = url_for(endpoint) %}
                 <li class="pure-menu-item {{ 'actived' if request.path == url else '' }}">
                     <a href="{{ url }}" class="pure-menu-link">{{ name }}</a>
                 </li>

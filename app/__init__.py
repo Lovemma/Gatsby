@@ -10,7 +10,7 @@ from werkzeug.local import LocalProxy, LocalStack
 
 from config import config
 from .extenions import db, auth
-from .utils import register_blueprint
+from .views.utils import register_blueprint
 
 _context_stack = LocalStack()
 
@@ -43,6 +43,7 @@ def setup_jinja2_environment(app):
     app.jinja_env.globals['ReactItem'] = ReactItem
     from .models.consts import K_POST
     app.jinja_env.globals['K_POST'] = K_POST
+    app.jinja_env.globals['SITE_NAV_MENUS'] = app.config.get('SITE_NAV_MENUS')
 
 
 def create_app(config_name='default'):
