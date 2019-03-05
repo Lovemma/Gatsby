@@ -9,10 +9,8 @@ from werkzeug.contrib.cache import MemcachedCache
 from werkzeug.local import LocalProxy, LocalStack
 
 from config import config
-from .utils import register_blueprint
 from .extenions import db, auth
-
-_app = Flask(__name__)
+from .utils import register_blueprint
 
 _context_stack = LocalStack()
 
@@ -48,30 +46,34 @@ def setup_jinja2_environment(app):
 
 
 def create_app(config_name='default'):
-    _app.request_class = Request
-    _app.config.from_object(config[config_name])
+    app = Flask(__name__)
+    app.request_class = Request
+    app.config.from_object(config[config_name])
 
-    db.init_app(_app)
-    auth.init_app(_app)
-    config[config_name].init_app(_app)
+    db.init_app(app)
+    auth.init_app(app)
+    config[config_name].init_app(app)
 
-    register_blueprint('app.views', _app)
-    setup_jinja2_environment(_app)
+    register_blueprint('app.views', app)
+    setup_jinja2_environment(app)
 
-    return _app
+    return app
 
 
-@_app.before_first_request
+app = create_app()
+
+
+@app.before_first_request
 def setup():
     global client
-    client = MemcachedCache(servers=_app.config.get('MEMCACHED_URL'))
-    Path(_app.config.get('UPLOAD_FOLDER')).mkdir(parents=True, exist_ok=True)
+    client = MemcachedCache(servers=app.config.get('MEMCACHED_URL'))
+    Path(app.config.get('UPLOAD_FOLDER')).mkdir(parents=True, exist_ok=True)
 
 
-@_app.before_request
+@app.before_request
 def setup_context():
-    host = _app.config.get('REDIS_HOST', 'localhost')
-    port = _app.config.get('REDIS_PORT', 6379)
+    host = app.config.get('REDIS_HOST', 'localhost')
+    port = app.config.get('REDIS_PORT', 6379)
     global _redis
     if _redis is None:
         pool = redis.ConnectionPool(host=host, port=port,
@@ -84,7 +86,7 @@ def setup_context():
     _context_stack.push(context)
 
 
-@_app.after_request
+@app.after_request
 def teardown(response):
     _context_stack.pop()
     return response

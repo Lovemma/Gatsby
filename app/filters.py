@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from . import _app as app
+from . import app
 
 
 @app.template_filter('hasattr')
