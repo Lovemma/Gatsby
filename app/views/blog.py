@@ -87,8 +87,3 @@ def tag(tag_id):
 @bp.route('/search')
 def search():
     return render_template('index.html')
-
-
-@bp.route('/atom.xml')
-def atom():
-    return render_template('index.html')

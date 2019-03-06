@@ -33,7 +33,10 @@ class DevelopmentConfig(Config):
     SHOW_PROFILE = False
     SITE_NAV_MENUS = [('blog.index', '首页'), ('blog.archives', '归档'),
                       ('blog.tags', '标签'), ('blog.search', '搜索'),
-                      ('blog.atom', '订阅'), ('/page/aboutme', '关于我')]
+                      ('index.feed', '订阅'), ('/page/aboutme', '关于我')]
+
+    AUTHOR = 'COldish'
+    SITE_TITLE = 'My Blog'
 
 
 class ProductionConfig(Config):

@@ -16,6 +16,7 @@ from .utils import trunc_utf8
 MC_KEY_TAGS_BY_POST_ID = 'post:%s:tags'
 MC_KEY_RELATED = 'post:related_posts:%s'
 MC_KEY_POST_BY_SLUG = 'post:%s:slug'
+MC_KEY_FEED = 'core:feed'
 
 markdown = mistune.Markdown()
 
@@ -135,6 +136,7 @@ class Post(CommentMixin, ReactMixin, BaseModel):
     def clear_mc(self):
         clear_mc(MC_KEY_RELATED % self.id)
         clear_mc(MC_KEY_POST_BY_SLUG % self.slug)
+        clear_mc(MC_KEY_FEED)
 
     @classmethod
     @cache(MC_KEY_POST_BY_SLUG % '{slug}')

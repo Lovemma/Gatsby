@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 
 from flask import (
     Blueprint, request, render_template, redirect, url_for,
-    current_app, session
-)
+    current_app, session, Response)
 from flask_login import login_required, login_user, logout_user
 from rauth import OAuth2Service
+from werkzeug.contrib.atom import AtomFeed
 
 from app.forms import LoginForm
+from app.models import Post
+from app.models.blog import MC_KEY_FEED
+from app.models.mc import cache
 from app.models.user import validate_login, create_github_user
 
 bp = Blueprint('index', __name__, url_prefix='/')
@@ -78,3 +82,28 @@ def oauth(post_id=None):
     session['user'] = user.to_dict()
 
     return redirect(url)
+
+
+@cache(MC_KEY_FEED)
+def _feed():
+    feed = AtomFeed(title=current_app.config.get('SITE_TITLE'),
+                    updated=datetime.now(), feed_url=request.url,
+                    url=request.host)
+    posts = Post.query.filter_by(published=Post.STATUS_ONLINE).order_by(
+        Post.id.desc()).all()
+    for post in posts:
+        body = post.html_content
+        summary = post.excerpt
+
+        feed.add(
+            post.title, body, content_type='html', summary=summary,
+            summary_type='html', author=current_app.config.get('AUTHOR'),
+            url=post.url, id=post.id, updated=post.created_at,
+            published=post.created_at
+        )
+    return feed.to_string()
+
+
+@bp.route('/atom.xml')
+def feed():
+    return Response(_feed(), content_type='text/xml')
