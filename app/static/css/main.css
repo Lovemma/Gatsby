@@ -1313,3 +1313,9 @@ hr {
     max-width: 880px;
     margin: auto;
 }
+
+.social-sharer {
+    max-width: 880px;
+    margin: 1rem auto;
+    text-align: center;
+}

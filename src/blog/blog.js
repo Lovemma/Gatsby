@@ -1,3 +1,5 @@
+import SocialSharer from './social-sharer';
+
 let $commentContainer = $('.gitment-comments-list');
 let $editorTab = $('.gitment-editor-tab');
 let $editorPreview = $('.gitment-editor-preview');
@@ -143,11 +145,11 @@ $reactionBtn.on('click', (e) => {
         dataType: 'json',
         success: function (rs) {
             if (!rs.r) {
-                $reactionContainer.empty().append(rs.html)
-                $reactionEnabled = !$reactionEnabled
-                console.log('表态成功')
+                $reactionContainer.empty().append(rs.html);
+                $reactionEnabled = !$reactionEnabled;
+                console.log('表态成功');
             } else {
-                console.log('表态失败')
+                console.log('表态失败');
                 if (rs.r == 403) {  // 未登录
                     window.location.href = `/oauth/post/${target_id}`;
                 }
@@ -156,3 +158,4 @@ $reactionBtn.on('click', (e) => {
     });
 });
 
+let socialSharer = new SocialSharer('.social-sharer');

@@ -7,6 +7,8 @@
           href="{{ url_for('static', filename='css/gitment.css') }} ">
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/react.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/social-sharer.min.css') }}">
     <meta name="post_id" content="{{ post.id }}">
 {% endblock %}
 
@@ -47,14 +49,20 @@
         <div class="toc-container"></div>
     </div>
 
-    <ul id="related">
-        {% for post in related_posts %}
-            <li>
-                <a href="{{ post.url }}"
-                   title="{{ post.title }}">{{ post.title }}</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="social-sharer" data-title="{{ post.title }}"
+         date-url="{{ post.url }}"
+         data-services="wechat,weibo,douban,yingxiang,linkedin"></div>
+
+    {% if related_posts %}
+        <ul id="related">
+            {% for post in related_posts %}
+                <li>
+                    <a href="{{ post.url }}"
+                       title="{{ post.title }}">{{ post.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
     <div id="reactions-container">
         {{ utils.render_react_container(stat, reaction_type) }}
