@@ -49,7 +49,7 @@ class Post(CommentMixin, ReactMixin, BaseModel):
     slug = db.Column(db.String(length=100))
     summary = db.Column(db.String(length=255))
     can_comment = db.Column(db.Boolean, default=True)
-    published = db.Column(db.Boolean, default=STATUSES)
+    status = db.Column(db.Boolean, default=STATUSES)
     kind = K_POST
 
     @classmethod
@@ -121,7 +121,7 @@ class Post(CommentMixin, ReactMixin, BaseModel):
             PostTag.post_id != self.id, PostTag.tag_id.in_(tag_ids))
                        .with_entities(PostTag.post_id).all())
 
-        excluded_ids = (self.query.filter(Post.published != self.STATUS_ONLINE)
+        excluded_ids = (self.query.filter(Post.status != self.STATUS_ONLINE)
                         .with_entities(Post.id).all())
 
         post_ids -= set(excluded_ids)

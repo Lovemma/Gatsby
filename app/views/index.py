@@ -89,7 +89,7 @@ def _feed():
     feed = AtomFeed(title=current_app.config.get('SITE_TITLE'),
                     updated=datetime.now(), feed_url=request.url,
                     url=request.host)
-    posts = Post.query.filter_by(published=Post.STATUS_ONLINE).order_by(
+    posts = Post.query.filter_by(status=Post.STATUS_ONLINE).order_by(
         Post.id.desc()).all()
     for post in posts:
         body = post.html_content

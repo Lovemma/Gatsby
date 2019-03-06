@@ -46,7 +46,7 @@ def post(ident):
 def archives():
     rv = {
         year: list(items) for year, items in groupby(
-        Post.query.filter_by(published=Post.STATUS_ONLINE).order_by(
+        Post.query.filter_by(status=Post.STATUS_ONLINE).order_by(
             Post.id.desc()).all(),
         lambda item: item.created_at.year)
     }
@@ -57,7 +57,7 @@ def archives():
 
 @bp.route('/archive/<year>')
 def archive(year):
-    posts = Post.query.filter(Post.published == Post.STATUS_ONLINE,
+    posts = Post.query.filter(Post.status == Post.STATUS_ONLINE,
                               Post.created_at >= f'{year}-01-01').order_by(
         Post.id.desc()).all()
     archives = [(year, posts)]

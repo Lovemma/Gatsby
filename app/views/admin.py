@@ -57,7 +57,7 @@ def _post(post_id=None):
         else:
             post = Post()
             msg = 'Post was successfully created.'
-        form.published.data = form.published.data == 'on'
+        form.status.data = form.status.data == 'on'
         tags = form.tags.data
         content = form.content.data
         del form.tags
@@ -74,7 +74,7 @@ def _post(post_id=None):
         form = PostForm(obj=post)
         form.tags.data = [tag.name for tag in post.tags]
         form.can_comment.data = post.can_comment
-        form.published.data = 'on' if post.published else 'off'
+        form.status.data = 'on' if post.status else 'off'
         form.submit.label.text = 'Update'
     tags = Tag.query.all()
     authors = User.query.all()

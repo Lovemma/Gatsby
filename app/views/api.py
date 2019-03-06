@@ -17,9 +17,9 @@ def publish(post_id):
     if not post:
         return jsonify({'r': 1, 'msg': 'Post not exist'})
     if request.method == 'POST':
-        post.published = True
+        post.status = True
     elif request.method == 'DELETE':
-        post.published = False
+        post.status = False
     post.save()
     return jsonify({'r': 0})
 

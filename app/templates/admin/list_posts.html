@@ -52,13 +52,13 @@
                     <a href="{{ post.author.url }}">{{ post.author.name }}</a>
                 </td>
                 <td>{{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                <td>{{ 'published' if post.published else 'unpublished' }}</td>
+                <td>{{ 'published' if post.status else 'unpublished' }}</td>
                 <td>
                     <label class="uk-switch">
                         <input type="checkbox"
                                data-url="{{ url_for('api.publish', post_id=post.id) }}"
 
-                                {% if post.published %}
+                                {% if post.status %}
                                checked
                                 {% endif %}
                         >

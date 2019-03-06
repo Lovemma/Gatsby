@@ -64,7 +64,7 @@ class PostForm(FlaskForm):
     tags = SelectMultipleField('Tags', default=[])
     author_id = SelectField('AuthorId', default='',
                             validators=[DataRequired()])
-    published = SwitchField('Published', choices=[('on', 1), ('off', 0)],
+    status = SwitchField('Published', choices=[('on', 1), ('off', 0)],
                             default='on')
     submit = SubmitField('Submit')
 
