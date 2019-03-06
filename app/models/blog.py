@@ -6,7 +6,7 @@ from html.parser import HTMLParser
 import mistune
 
 from app.extenions import db
-from .base import BaseModel
+from .base import BaseModel, MC_KEY_ITEM_BY_ID
 from .comment import CommentMixin
 from .consts import K_POST, ONE_HOUR
 from .mc import cache, clear_mc
@@ -15,6 +15,7 @@ from .utils import trunc_utf8
 
 MC_KEY_TAGS_BY_POST_ID = 'post:%s:tags'
 MC_KEY_RELATED = 'post:related_posts:%s'
+MC_KEY_POST_BY_SLUG = 'post:%s:slug'
 
 markdown = mistune.Markdown()
 
@@ -133,6 +134,19 @@ class Post(CommentMixin, ReactMixin, BaseModel):
 
     def clear_mc(self):
         clear_mc(MC_KEY_RELATED % self.id)
+        clear_mc(MC_KEY_POST_BY_SLUG % self.slug)
+
+    @classmethod
+    @cache(MC_KEY_POST_BY_SLUG % '{slug}')
+    def get_by_slug(cls, slug):
+        return cls.query.filter_by(slug=slug).first()
+
+    @classmethod
+    def cache(cls, ident):
+        obj = super().cache(ident)
+        if not obj:
+            return cls.get_by_slug(ident)
+        return obj
 
 
 class Tag(BaseModel):

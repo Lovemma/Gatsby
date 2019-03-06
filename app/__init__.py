@@ -44,6 +44,7 @@ def setup_jinja2_environment(app):
     from .models.consts import K_POST
     app.jinja_env.globals['K_POST'] = K_POST
     app.jinja_env.globals['SITE_NAV_MENUS'] = app.config.get('SITE_NAV_MENUS')
+    app.jinja_env.globals['SHOW_PROFILE'] = app.config.get('SHOW_PROFILE')
 
 
 def create_app(config_name='default'):

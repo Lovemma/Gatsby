@@ -30,9 +30,10 @@ class DevelopmentConfig(Config):
     HERE = os.path.abspath(os.path.dirname(__file__))
     UPLOAD_FOLDER = os.path.join(HERE, 'app/static/upload')
 
+    SHOW_PROFILE = False
     SITE_NAV_MENUS = [('blog.index', '首页'), ('blog.archives', '归档'),
                       ('blog.tags', '标签'), ('blog.search', '搜索'),
-                      ('blog.atom', '订阅')]
+                      ('blog.atom', '订阅'), ('/page/aboutme', '关于我')]
 
 
 class ProductionConfig(Config):

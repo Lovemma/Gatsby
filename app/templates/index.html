@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="post-list">
+    <div class="{{ post-list if SHOW_PROFILE else '' }}">
         <div class="recent-posts">
             {% for post in posts %}
                 <article class="recent-post-item">
@@ -40,28 +40,31 @@
         </div>
     </div>
 
-    <section id="sidebar">
-        <div class="short-about">
-            <img id="avatar_pic"
-                 src="{{ url_for('static', filename='upload/' + profile.avatar) }}">
-            <p>{{ profile.intro }}</p>
+    {% if SHOW_PROFILE %}
+        <section id="sidebar">
 
-            <!-- SNS Link -->
-            <ul class="list-inline">
-                {% for sns in ('github', 'linkedin') %}
-                    <li><a target="_blank"
-                           href="{{ profile|getattr(sns + '_url') }}">
+            <div class="short-about">
+                <img id="avatar_pic"
+                     src="{{ url_for('static', filename='upload/' + profile.avatar) }}">
+                <p>{{ profile.intro }}</p>
+
+                <!-- SNS Link -->
+                <ul class="list-inline">
+                    {% for sns in ('github', 'linkedin') %}
+                        <li><a target="_blank"
+                               href="{{ profile|getattr(sns + '_url') }}">
             <span class="fa-stack fa-lg">
               <i class="fa fa-circle fa-stack-2x"></i>
               <i class="fa fa-{{ sns }} fa-stack-1x fa-inverse"></i>
             </span>
-                    </a>
-                    </li>
+                        </a>
+                        </li>
 
-                {% endfor %}
-            </ul>
-        </div>
-    </section>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+    {% endif %}
 {% endblock %}
 
 {% block pagination %}

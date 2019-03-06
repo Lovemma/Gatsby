@@ -19,9 +19,11 @@ def index():
     return render_template('index.html', posts=posts, profile=profile)
 
 
-@bp.route('/post/<post_id>/')
-def post(post_id):
-    post = Post.query.get_or_404(post_id)
+@bp.route('/post/<ident>/')
+@bp.route('/page/<ident>/')
+def post(ident):
+    post = Post.get_or_404(ident)
+    post_id = post.id
     github_user = session.get('user')
     stat = ReactStats.get_by_target(post_id, K_POST)
     reaction_type = None

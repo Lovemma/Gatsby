@@ -25,15 +25,12 @@
         </a>
 
         <ul class="pure-menu-list clearfix">
-            {% for endpoint, name in SITE_NAV_MENUS %}
-                {% set url = url_for(endpoint) %}
+            {% for endpoint_or_url, name in SITE_NAV_MENUS %}
+                {% set url = url_for(endpoint_or_url) if '.' in endpoint_or_url else endpoint_or_url %}
                 <li class="pure-menu-item {{ 'actived' if request.path == url else '' }}">
                     <a href="{{ url }}" class="pure-menu-link">{{ name }}</a>
                 </li>
             {% endfor %}
-
-            <li class="pure-menu-item"><a href="/page/aboutme"
-                                          class="pure-menu-link">关于</a></li>
         </ul>
     </nav>
 </div>

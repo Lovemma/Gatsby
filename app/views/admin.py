@@ -88,18 +88,6 @@ def edit_post(post_id=None):
     return _post(post_id=post_id)
 
 
-@bp.route('/pages')
-@login_required
-def list_pages():
-    return render_template('admin/index.html')
-
-
-@bp.route('/pages/new')
-@login_required
-def new_page():
-    return render_template('admin/index.html')
-
-
 @bp.route('/users')
 @login_required
 def list_users():

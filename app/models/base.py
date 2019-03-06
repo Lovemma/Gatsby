@@ -2,6 +2,8 @@
 
 from datetime import datetime
 
+from flask import abort
+
 from app import context
 from app.extenions import db
 from .mc import cache, clear_mc
@@ -45,6 +47,13 @@ class BaseModel(db.Model):
     def get_props_by_key(self, key):
         key = self.get_db_key(key)
         return self.redis.get(key) or b''
+
+    @classmethod
+    def get_or_404(cls, id):
+        obj = cls.cache(id)
+        if not obj:
+            abort(404)
+        return obj
 
     @classmethod
     @cache(MC_KEY_ITEM_BY_ID % ('{cls.__name__}', '{id}'))

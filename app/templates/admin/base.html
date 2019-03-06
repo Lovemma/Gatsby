@@ -24,13 +24,13 @@
                             <li class="uk-active"><a href="/admin">Home</a></li>
                             <li><a href="{{ url_for('admin.list_posts') }}">Posts</a>
                             </li>
-                            <li><a href="{{ url_for('admin.list_pages') }}">Pages</a>
-                            </li>
                             <li><a href="{{ url_for('admin.list_users') }}">Users</a>
                             </li>
-                            <li>
-                                <a href="{{ url_for('admin.profile') }}">Profile</a>
-                            </li>
+                            {% if SHOW_PROFILE %}
+                                <li>
+                                    <a href="{{ url_for('admin.profile') }}">Profile</a>
+                                </li>
+                            {% endif %}
                         </ul>
 
                     </div>
