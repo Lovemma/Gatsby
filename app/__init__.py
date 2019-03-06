@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import redis
-from flask import Flask, Request as _Request
+from flask import Flask, Request as _Request, Response, render_template
 from flask_login import current_user
 from werkzeug.contrib.cache import MemcachedCache
 from werkzeug.local import LocalProxy, LocalStack
@@ -92,6 +93,33 @@ def setup_context():
 def teardown(response):
     _context_stack.pop()
     return response
+
+
+from app.models import Post, Tag
+
+
+def _sitemap():
+    ten_days_ago = (datetime.now() - timedelta(days=10)).date().isoformat()
+    posts = Post.query.filter_by(status=Post.STATUS_ONLINE).order_by(
+        Post.id.desc()).all()
+    tags = Tag.query.order_by(Tag.id.desc()).all()
+    items = []
+
+    for rv in [posts, tags]:
+        items.extend([(item.url, item.created_at) for item in rv])
+
+    for route in app.url_map.iter_rules():
+        if any(endpoint in route.rule for endpoint in ('/admin', '/j', '/api')):
+            continue
+        if 'GET' in route.methods and not route.arguments:
+            items.append([route.rule, ten_days_ago])
+
+    return render_template('sitemap.xml', items=items)
+
+
+@app.route('/sitemap.xml')
+def sitemap():
+    return Response(_sitemap(), content_type='text/xml')
 
 
 from .filters import has_attr, get_attr
