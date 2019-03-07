@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
+import re
 import random
 from html.parser import HTMLParser
 
 import mistune
+from pygments import highlight
+from pygments.formatters.html import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
 
 from app.extenions import db
-from .base import BaseModel, MC_KEY_ITEM_BY_ID
+from .base import BaseModel
 from .comment import CommentMixin
 from .consts import K_POST, ONE_HOUR
 from .mc import cache, clear_mc
@@ -17,8 +21,9 @@ MC_KEY_TAGS_BY_POST_ID = 'post:%s:tags'
 MC_KEY_RELATED = 'post:related_posts:%s'
 MC_KEY_POST_BY_SLUG = 'post:%s:slug'
 MC_KEY_FEED = 'core:feed'
+MC_KEY_SITEMAP = 'core:sitemap'
 
-markdown = mistune.Markdown()
+BQ_REGEX = re.compile(r'<blockquote>.*?</blockquote>')
 
 
 class MLStripper(HTMLParser):
@@ -34,6 +39,80 @@ class MLStripper(HTMLParser):
 
     def get_data(self):
         return ''.join(self.fed)
+
+
+class BlogHtmlFormatter(HtmlFormatter):
+    def __init__(self, **options):
+        super().__init__(**options)
+        self.lang = options.get('lang', '')
+
+    def _wrap_div(self, inner):
+        style = []
+        if (self.noclasses and not self.nobackground and
+                self.style.background_color is not None):
+            style.append('background: %s' % (self.style.background_color,))
+        if self.cssstyles:
+            style.append(self.cssstyles)
+        style = '; '.join(style)
+
+        yield 0, ('<figure' + (
+                    self.cssclass and ' class="%s"' % self.cssclass) +  # noqa
+                  (style and (' style="%s"' % style)) +
+                  (self.lang and ' data-lang="%s"' % self.lang) +
+                  '><table><tbody><tr><td class="code">')
+        for tup in inner:
+            yield tup
+        yield 0, '</table></figure>\n'
+
+    def _wrap_pre(self, inner):
+        style = []
+        if self.prestyles:
+            style.append(self.prestyles)
+        if self.noclasses:
+            style.append('line-height: 125%')
+        style = '; '.join(style)
+
+        if self.filename:
+            yield 0, ('<span class="filename">' + self.filename + '</span>')
+
+        # the empty span here is to keep leading empty lines from being
+        # ignored by HTML parsers
+        yield 0, ('<pre' + (style and ' style="%s"' % style) + (
+                    self.lang and f' class="hljs {self.lang}"') + '><span></span>')
+        for tup in inner:
+            yield tup
+        yield 0, '</pre>'
+
+
+def block_code(text, lang, inlinestyles=False, linenos=False):
+    if not lang:
+        text = text.strip()
+        return '<pre><code>%s</code></pre>\n' % mistune.escape(text)
+
+    try:
+        lexer = get_lexer_by_name(lang, stripall=True)
+        formatter = BlogHtmlFormatter(
+            noclasses=inlinestyles, linenos=linenos,
+            cssclass='highlight %s' % lang, lang=lang
+        )
+        code = highlight(text, lexer, formatter)
+        return code
+    except Exception:
+        return '<pre class="%s"><code>%s</code></pre>\n' % (
+            lang, mistune.escape(text)
+        )
+
+
+class BranRenderer(mistune.Renderer):
+
+    def block_code(self, text, lang):
+        inlinestyles = self.options.get('inlinestyles')
+        linenos = self.options.get('linenos')
+        return block_code(text, lang, inlinestyles, linenos)
+
+
+renderer = BranRenderer(linenos=False, inlinestyles=False)
+markdown = mistune.Markdown(escape=True, renderer=renderer)
 
 
 class Post(CommentMixin, ReactMixin, BaseModel):
@@ -112,7 +191,7 @@ class Post(CommentMixin, ReactMixin, BaseModel):
             return self.summary
         s = MLStripper()
         s.feed(self.html_content)
-        return trunc_utf8(s.get_data(), 100)
+        return trunc_utf8(BQ_REGEX.sub('', s.get_data().replace('\n', ''), 100))
 
     @cache(MC_KEY_RELATED % ('{self.id}'), ONE_HOUR)
     def get_related(self, limit=4):
@@ -136,7 +215,8 @@ class Post(CommentMixin, ReactMixin, BaseModel):
     def clear_mc(self):
         clear_mc(MC_KEY_RELATED % self.id)
         clear_mc(MC_KEY_POST_BY_SLUG % self.slug)
-        clear_mc(MC_KEY_FEED)
+        for key in [MC_KEY_FEED, MC_KEY_SITEMAP]:
+            clear_mc(key)
 
     @classmethod
     @cache(MC_KEY_POST_BY_SLUG % '{slug}')

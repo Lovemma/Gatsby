@@ -96,8 +96,11 @@ def teardown(response):
 
 
 from app.models import Post, Tag
+from app.models.mc import cache
+from app.models.blog import MC_KEY_SITEMAP
 
 
+@cache(MC_KEY_SITEMAP)
 def _sitemap():
     ten_days_ago = (datetime.now() - timedelta(days=10)).date().isoformat()
     posts = Post.query.filter_by(status=Post.STATUS_ONLINE).order_by(

@@ -1,4 +1,6 @@
 import SocialSharer from './social-sharer';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/tomorrow.css';
 
 let $commentContainer = $('.gitment-comments-list');
 let $editorTab = $('.gitment-editor-tab');
@@ -155,6 +157,15 @@ $reactionBtn.on('click', (e) => {
                 }
             }
         }
+    });
+});
+
+$(document).ready(function () {
+    $('figure pre').each(function (i, block) {
+        var figure = $(this).parents('figure');
+        var lang = figure.attr('class').split(' ')[1] || 'code';
+        figure.attr('data-lang', lang.toUpperCase());
+        hljs.highlightBlock(block);
     });
 });
 

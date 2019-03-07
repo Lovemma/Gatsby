@@ -17,6 +17,7 @@ rauth = "*"
 pylibmc = "*"
 blinker = "*"
 jsonschema = "*"
+pygments = "*"
 
 [requires]
 python_version = "3.7"
