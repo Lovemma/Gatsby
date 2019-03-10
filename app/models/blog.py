@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import re
 import random
+import re
 from html.parser import HTMLParser
 
 import mistune
@@ -15,6 +15,7 @@ from .comment import CommentMixin
 from .consts import K_POST, ONE_HOUR
 from .mc import cache, clear_mc
 from .react import ReactMixin
+from .toc import TocMixin
 from .utils import trunc_utf8
 
 MC_KEY_TAGS_BY_POST_ID = 'post:%s:tags'
@@ -56,7 +57,7 @@ class BlogHtmlFormatter(HtmlFormatter):
         style = '; '.join(style)
 
         yield 0, ('<figure' + (
-                    self.cssclass and ' class="%s"' % self.cssclass) +  # noqa
+                self.cssclass and ' class="%s"' % self.cssclass) +  # noqa
                   (style and (' style="%s"' % style)) +
                   (self.lang and ' data-lang="%s"' % self.lang) +
                   '><table><tbody><tr><td class="code">')
@@ -78,7 +79,7 @@ class BlogHtmlFormatter(HtmlFormatter):
         # the empty span here is to keep leading empty lines from being
         # ignored by HTML parsers
         yield 0, ('<pre' + (style and ' style="%s"' % style) + (
-                    self.lang and f' class="hljs {self.lang}"') + '><span></span>')
+                self.lang and f' class="hljs {self.lang}"') + '><span></span>')
         for tup in inner:
             yield tup
         yield 0, '</pre>'
@@ -105,14 +106,24 @@ def block_code(text, lang, inlinestyles=False, linenos=False):
 
 class BranRenderer(mistune.Renderer):
 
+    def header(self, text, level, raw=None):
+        text = text.replace(' ', '')
+        return f'<h{level} id="{text}">{text}</h{level}>\n'
+
     def block_code(self, text, lang):
         inlinestyles = self.options.get('inlinestyles')
         linenos = self.options.get('linenos')
         return block_code(text, lang, inlinestyles, linenos)
 
 
+class TocRenderer(TocMixin, mistune.Renderer):
+    ...
+
+
 renderer = BranRenderer(linenos=False, inlinestyles=False)
+toc = TocRenderer()
 markdown = mistune.Markdown(escape=True, renderer=renderer)
+toc_md = mistune.Markdown(renderer=toc)
 
 
 class Post(CommentMixin, ReactMixin, BaseModel):
@@ -191,7 +202,16 @@ class Post(CommentMixin, ReactMixin, BaseModel):
             return self.summary
         s = MLStripper()
         s.feed(self.html_content)
-        return trunc_utf8(BQ_REGEX.sub('', s.get_data().replace('\n', ''), 100))
+        return trunc_utf8(BQ_REGEX.sub('', s.get_data().replace('\n', '')), 100)
+
+    @property
+    def toc(self):
+        content = self.content
+        if not content:
+            return ''
+        toc.reset_toc()
+        toc_md.parse(content)
+        return toc.render_toc(level=4)
 
     @cache(MC_KEY_RELATED % ('{self.id}'), ONE_HOUR)
     def get_related(self, limit=4):

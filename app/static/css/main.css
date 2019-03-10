@@ -508,8 +508,8 @@ body {
         display: block;
         position: fixed;
         margin-left: -15px;
-        max-height: calc(100vh - 150px);
         width: 200px;
+        z-index: 1;
         top: 25%;
         font-size: 12px;
         padding: 10px;

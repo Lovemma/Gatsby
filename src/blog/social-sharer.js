@@ -1,4 +1,5 @@
 // https://github.com/Cople/SocialSharer
+import QRCode from 'qrcode';
 
 function getMetaContentByName(name) {
     const el = document.querySelector(`meta[name='${name}']`);
@@ -59,7 +60,6 @@ let templates = SocialSharer.templates = {
     linkedin: "http://www.linkedin.com/shareArticle?mini=true&url={url}&title={title}&summary={summary}&source={source}",
     evernote: "http://www.evernote.com/clip.action?url={url}&title={title}",
     yingxiang: "http://app.yinxiang.com/clip.action?url={url}&title={title}",
-    qrcode: "//api.qrserver.com/v1/create-qr-code/?size={qrcodeSize}x{qrcodeSize}&margin=20&data={url}",
     email: "mailto:?subject={title}&body={url}",
     webshare: "javascript:;"
 };
@@ -175,12 +175,18 @@ SocialSharer.prototype = {
     createQRCode(icon) {
         const box = document.createElement("div");
         box.className = "qrcode-box";
-        box.innerHTML = `<h4>${this.options.wechatTitle}</h4><img src='${this.getURL("qrcode")}' /><p>${this.options.wechatTip}</p>`;
+        QRCode.toDataURL(this.options.url)
+        .then(url => {
+          box.innerHTML = `<h4>${this.options.wechatTitle}</h4><img src='${url}' /><p>${this.options.wechatTip}</p>`;
+        })
+        .catch(err => {
+          console.error(err)
+        });
         icon.appendChild(box);
     },
 
     getURL(service) {
-        const template = templates[service === "wechat" ? "qrcode" : service];
+        const template = templates[service];
         const options = this.options;
         return template ? template.replace(/\{(.*?)\}/g, (match, key) => {
             return encodeURIComponent(options[key]);

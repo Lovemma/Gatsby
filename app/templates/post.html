@@ -46,7 +46,9 @@
             </div>
 
         </article>
-        <div class="toc-container"></div>
+        <div class="toc-container">
+            {{ post.toc|safe }}
+        </div>
     </div>
 
     <div class="social-sharer" data-title="{{ post.title }}"
