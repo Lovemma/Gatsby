@@ -10,7 +10,7 @@ from werkzeug.contrib.atom import AtomFeed
 
 from app.forms import LoginForm
 from app.models import Post
-from app.models.blog import MC_KEY_FEED
+from app.models.blog import MC_KEY_FEED, MC_KEY_SEARCH
 from app.models.mc import cache
 from app.models.user import validate_login, create_github_user
 
@@ -119,6 +119,7 @@ def search_json():
     return jsonify(_search_json())
 
 
+@cache(MC_KEY_SEARCH)
 def _search_json():
     posts = Post.query.filter_by(status=Post.STATUS_ONLINE).order_by(
         Post.id.desc()).all()

@@ -23,6 +23,7 @@ MC_KEY_RELATED = 'post:related_posts:%s'
 MC_KEY_POST_BY_SLUG = 'post:%s:slug'
 MC_KEY_FEED = 'core:feed'
 MC_KEY_SITEMAP = 'core:sitemap'
+MC_KEY_SEARCH = 'core:search.json'
 
 BQ_REGEX = re.compile(r'<blockquote>.*?</blockquote>')
 
@@ -235,7 +236,7 @@ class Post(CommentMixin, ReactMixin, BaseModel):
     def clear_mc(self):
         clear_mc(MC_KEY_RELATED % self.id)
         clear_mc(MC_KEY_POST_BY_SLUG % self.slug)
-        for key in [MC_KEY_FEED, MC_KEY_SITEMAP]:
+        for key in [MC_KEY_FEED, MC_KEY_SITEMAP, MC_KEY_SEARCH]:
             clear_mc(key)
 
     @classmethod

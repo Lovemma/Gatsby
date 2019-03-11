@@ -11,6 +11,16 @@
                            results="0" autocomplete="off" placeholder="搜索"
                            class="pure-input pure-input-1">
                 </form>
+                <div id="local-search-result">
+                    <ul class="search-result-list">
+                        {% for post in [] %}
+                            <li><a href="{{ post.url }}"
+                                   class="search-result-title">{{ post.title }}</a>
+                                <p class="search-result">{{ post.excerpt }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
     </article>
@@ -18,4 +28,8 @@
 
 {% block pagination %}
 
+{% endblock %}
+
+{% block bottom_script %}
+    <script src="{{ url_for('static', filename='dist/blog/search.js') }}"></script>
 {% endblock %}
