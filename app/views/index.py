@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask import (
     Blueprint, request, render_template, redirect, url_for,
-    current_app, session, Response)
+    current_app, session, Response, jsonify)
 from flask_login import login_required, login_user, logout_user
 from rauth import OAuth2Service
 from werkzeug.contrib.atom import AtomFeed
@@ -107,3 +107,25 @@ def _feed():
 @bp.route('/atom.xml')
 def feed():
     return Response(_feed(), content_type='text/xml')
+
+
+@bp.route('/search')
+def search():
+    return render_template('search.html')
+
+
+@bp.route('/search.json')
+def search_json():
+    return jsonify(_search_json())
+
+
+def _search_json():
+    posts = Post.query.filter_by(status=Post.STATUS_ONLINE).order_by(
+        Post.id.desc()).all()
+    return [
+        {
+            'url': post.url,
+            'tags': [tag.name for tag in post.tags],
+            'title': post.title,
+            'content': post.html_content
+        } for post in posts]

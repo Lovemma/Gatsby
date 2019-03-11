@@ -82,8 +82,3 @@ def tag(tag_id):
         PostTag.post_id.desc()).with_entities(PostTag.post_id).all()
     posts = Post.get_multi(post_ids)
     return render_template('tag.html', tag=tag, posts=posts)
-
-
-@bp.route('/search')
-def search():
-    return render_template('index.html')

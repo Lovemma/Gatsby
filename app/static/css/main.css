@@ -755,6 +755,7 @@ body {
     max-width: 880px;
     border: none;
     box-shadow: none;
+    margin: auto;
 }
 
 .page hr {
@@ -1350,4 +1351,8 @@ hr {
 
 .hljs {
     background: #f8f8f8 !important;
+}
+
+#local-search-input {
+    box-shadow: unset;
 }

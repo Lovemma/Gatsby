@@ -32,7 +32,7 @@ class DevelopmentConfig(Config):
 
     SHOW_PROFILE = False
     SITE_NAV_MENUS = [('blog.index', '首页'), ('blog.archives', '归档'),
-                      ('blog.tags', '标签'), ('blog.search', '搜索'),
+                      ('blog.tags', '标签'), ('index.search', '搜索'),
                       ('index.feed', '订阅'), ('/page/aboutme', '关于我')]
 
     AUTHOR = 'COldish'
