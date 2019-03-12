@@ -3,36 +3,56 @@
 from collections import Counter
 from itertools import groupby
 
-from flask import Blueprint, render_template, session
+from flask import Blueprint, render_template, session, abort, current_app
 
-from app.models import Post, PostTag, Tag, ReactItem, ReactStats
-from app.models.consts import K_POST
+from app.models import Post, PostTag, Tag
 from app.models.profile import get_profile
+from app.models.utils import Pagination
 
 bp = Blueprint('blog', __name__, url_prefix='/')
 
 
 @bp.route('/')
 def index():
-    posts = Post.query.all()
+    return _posts()
+
+
+def _posts(page=1):
+    PER_PAGE = current_app.config.get('PER_PAGE')
+    start = (page - 1) * PER_PAGE
+    posts = Post.get_all()
+    total = len(posts)
+    posts = posts[start: start + PER_PAGE]
+    paginator = Pagination(page, PER_PAGE, total)
     profile = get_profile()
-    return render_template('index.html', posts=posts, profile=profile)
+
+    return render_template('index.html', posts=posts, paginator=paginator,
+                           profile=profile)
 
 
 @bp.route('/post/<ident>/')
-@bp.route('/page/<ident>/')
 def post(ident):
+    return _post(ident=ident)
+
+
+@bp.route('/page/<ident>/')
+def page(ident=1):
+    if str(ident).isdigit():
+        return _posts(page=int(ident))
+    return _post(ident=ident)
+
+
+def _post(ident, is_preview=False):
     post = Post.get_or_404(ident)
-    post_id = post.id
+    if not is_preview and post.status != Post.STATUS_ONLINE:
+        abort(404)
     github_user = session.get('user')
-    stat = ReactStats.get_by_target(post_id, K_POST)
+    stat = post.stats
     reaction_type = None
     liked_comment_ids = []
     if github_user:
-        reaction_item = ReactItem.get_reaction_item(
-            github_user['id'], post_id, K_POST)
-        if reaction_item:
-            reaction_type = reaction_item.reaction_type
+        reaction_type = post.get_reaction_type(github_user['gid'])
+
         liked_comment_ids = post.comment_ids_liked_by(
             github_user['gid'])
     related_posts = post.get_related()

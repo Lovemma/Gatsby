@@ -38,6 +38,8 @@ class DevelopmentConfig(Config):
     AUTHOR = 'COldish'
     SITE_TITLE = 'My Blog'
 
+    PER_PAGE = 10
+
 
 class ProductionConfig(Config):
     pass

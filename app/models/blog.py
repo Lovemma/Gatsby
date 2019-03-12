@@ -24,6 +24,7 @@ MC_KEY_POST_BY_SLUG = 'post:%s:slug'
 MC_KEY_FEED = 'core:feed'
 MC_KEY_SITEMAP = 'core:sitemap'
 MC_KEY_SEARCH = 'core:search.json'
+MC_KEY_ALL_POSTS = 'core:posts'
 
 BQ_REGEX = re.compile(r'<blockquote>.*?</blockquote>')
 
@@ -203,7 +204,7 @@ class Post(CommentMixin, ReactMixin, BaseModel):
             return self.summary
         s = MLStripper()
         s.feed(self.html_content)
-        return trunc_utf8(BQ_REGEX.sub('', s.get_data().replace('\n', '')), 100)
+        return trunc_utf8(BQ_REGEX.sub('', s.get_data()).replace('\n', ''), 100)
 
     @property
     def toc(self):
@@ -217,6 +218,8 @@ class Post(CommentMixin, ReactMixin, BaseModel):
     @cache(MC_KEY_RELATED % ('{self.id}'), ONE_HOUR)
     def get_related(self, limit=4):
         tag_ids = [tag.id for tag in self.tags]
+        if not tag_ids:
+            return []
         post_ids = set(PostTag.query.filter(
             PostTag.post_id != self.id, PostTag.tag_id.in_(tag_ids))
                        .with_entities(PostTag.post_id).all())
@@ -236,7 +239,8 @@ class Post(CommentMixin, ReactMixin, BaseModel):
     def clear_mc(self):
         clear_mc(MC_KEY_RELATED % self.id)
         clear_mc(MC_KEY_POST_BY_SLUG % self.slug)
-        for key in [MC_KEY_FEED, MC_KEY_SITEMAP, MC_KEY_SEARCH]:
+        for key in [MC_KEY_FEED, MC_KEY_SITEMAP, MC_KEY_SEARCH,
+                    MC_KEY_ALL_POSTS]:
             clear_mc(key)
 
     @classmethod
@@ -245,11 +249,15 @@ class Post(CommentMixin, ReactMixin, BaseModel):
         return cls.query.filter_by(slug=slug).first()
 
     @classmethod
+    @cache(MC_KEY_ALL_POSTS)
+    def get_all(cls):
+        return cls.query.filter_by(status=cls.STATUS_ONLINE).all()
+
+    @classmethod
     def cache(cls, ident):
-        obj = super().cache(ident)
-        if not obj:
-            return cls.get_by_slug(ident)
-        return obj
+        if str(ident).isdigit() or hasattr(ident, 'post_id'):
+            return super().cache(ident)
+        return cls.get_by_slug(ident)
 
 
 class Tag(BaseModel):

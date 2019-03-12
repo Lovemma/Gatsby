@@ -68,5 +68,25 @@
 {% endblock %}
 
 {% block pagination %}
+    <nav class="page-nav text-center">
+        {% if paginator.has_prev %}
+            <a class="extend prev" rel="prev"
+               href="{{ url_for('blog.page', ident=paginator.prev_num) }}">
+                <</a>
+        {% endif %}
 
+        {% for page in paginator.iter_pages() %}
+            {% if page == paginator.page %}
+                <span class="page-number current">{{ page }}</span>
+            {% else %}
+                <a class="page-number"
+                   href="{{ url_for('blog.page', ident=page) }}">{{ page }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if paginator.has_next %}
+            <a class="extend next" rel="next"
+               href="{{ url_for('blog.page', ident=paginator.next_num) }}"
+        {% endif %}
+    </nav>
 {% endblock %}
