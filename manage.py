@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
+
 import click
+import cssmin
 from sqlalchemy.exc import IntegrityError
 
 from app import create_app
 from app.extenions import db
 from app.models import create_user
+from app.config import HERE
 
 
 @click.group()
@@ -37,6 +41,31 @@ def _adduser(**kwargs):
               confirmation_prompt=True)
 def adduser(name, email, password):
     _adduser(name=name, email=email, password=password)
+
+
+@cli.command()
+def build_css():
+    build_map = {
+        'main.min.css': ['pure-min.css', 'base.css'],
+        'index.min.css': ['main.min.css', 'fontawesome.min.css'],
+        'post.min.css': ['index.min.css', 'react.css', 'gitment.css',
+                         'social-sharer.css']
+    }
+    css_map = {}
+    css_dir = Path(HERE) / 'static/css/'
+    for css, files in build_map.items():
+        data = ''
+        for file in files:
+            if file in css_map:
+                data += css_map[file]
+            else:
+                with open(css_dir / file) as f:
+                    data_ = f.read()
+                    css_map[file] = data_
+                data += data_
+        with open(css_dir / css, 'w') as f:
+            f.write(cssmin.cssmin(data))
+            css_map[css] = data
 
 
 if __name__ == '__main__':

@@ -1147,4 +1147,22 @@ a.gitment-editor-footer-tip:hover {
     .gitment-editor-tab:last-child {
         display: none;
     }
+
+    .gitment-comment, .gitment-editor-container {
+        min-height: 30px;
+        padding-left: 30px;
+        margin: 10px 0;
+    }
+
+    .gitment-comment-avatar, .gitment-comment-avatar-img, .gitment-comment-avatar,
+    .gitment-editor-avatar-img, .gitment-editor-avatar svg {
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+    }
+
+    .gitment-comment-avatar, .gitment-editor-avatar {
+        margin-left: -40px;
+        margin-top: 5px;
+    }
 }

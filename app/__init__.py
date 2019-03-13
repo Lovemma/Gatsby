@@ -9,7 +9,7 @@ from flask_login import current_user
 from werkzeug.contrib.cache import MemcachedCache
 from werkzeug.local import LocalProxy, LocalStack
 
-from config import config
+from app import config
 from .extenions import db, auth
 from .views.utils import register_blueprint
 
@@ -51,11 +51,10 @@ def setup_jinja2_environment(app):
 def create_app(config_name='default'):
     app = Flask(__name__)
     app.request_class = Request
-    app.config.from_object(config[config_name])
+    app.config.from_object(config)
 
     db.init_app(app)
     auth.init_app(app)
-    config[config_name].init_app(app)
 
     register_blueprint('app.views', app)
     setup_jinja2_environment(app)

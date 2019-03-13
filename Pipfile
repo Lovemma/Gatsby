@@ -18,6 +18,7 @@ pylibmc = "*"
 blinker = "*"
 jsonschema = "*"
 pygments = "*"
+cssmin = "*"
 
 [requires]
 python_version = "3.7"
