@@ -11,7 +11,6 @@ require("codemirror/addon/selection/mark-selection.js");
 require("codemirror/mode/gfm/gfm.js");
 require("codemirror/mode/xml/xml.js");
 require("codemirror/mode/python/python.js");
-var CodeMirrorSpellChecker = require("codemirror-spell-checker");
 var marked = require("marked");
 
 
@@ -1437,20 +1436,9 @@ SimpleMDE.prototype.render = function (el) {
     }, false);
 
     var mode, backdrop;
-    if (options.spellChecker !== false) {
-        mode = "spell-checker";
-        backdrop = options.parsingConfig;
-        backdrop.name = "gfm";
-        backdrop.gitHubSpice = false;
-
-        CodeMirrorSpellChecker({
-            codeMirrorInstance: CodeMirror
-        });
-    } else {
-        mode = options.parsingConfig;
-        mode.name = "gfm";
-        mode.gitHubSpice = false;
-    }
+    mode = options.parsingConfig;
+    mode.name = "gfm";
+    mode.gitHubSpice = false;
 
     this.codemirror = CodeMirror.fromTextArea(el, {
         mode: mode,

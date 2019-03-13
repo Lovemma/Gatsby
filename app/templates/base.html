@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+          content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
     <title>
         {% block title %}M-in's Blog{% endblock %}
     </title>
     {% block doc_head %}
         <link rel="stylesheet"
-              href="{{ url_for('static', filename='css/pure-min.css') }}">
-        <link rel="stylesheet"
-              href="{{ url_for('static', filename='css/main.css') }}">
+              href="{{ url_for('static', filename='css/main.min.css') }}">
 
         {% block more_head %}
         {% endblock %}
@@ -53,7 +51,9 @@
         Powered by
         <a class="href-item" href="https://github.com/pallets/flask"
            target="_blank">Flask</a>
-        And other Flask extensions
+        | Theme inspired by <a class="href-item"
+                               href="https://github.com/KevinOfNeu/hexo-theme-xoxo"
+                               target="_blank">hexo-theme-xoxo</a>
     </div>
 </footer>
 

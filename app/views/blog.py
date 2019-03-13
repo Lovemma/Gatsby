@@ -47,7 +47,7 @@ def _post(ident, is_preview=False):
     if not is_preview and post.status != Post.STATUS_ONLINE:
         abort(404)
     github_user = session.get('user')
-    stat = post.stats
+    stats = post.stats
     reaction_type = None
     liked_comment_ids = []
     if github_user:
@@ -57,7 +57,7 @@ def _post(ident, is_preview=False):
             github_user['gid'])
     related_posts = post.get_related()
     return render_template('post.html', post=post, github_user=github_user,
-                           stat=stat, reaction_type=reaction_type,
+                           stats=stats, reaction_type=reaction_type,
                            liked_comment_ids=liked_comment_ids,
                            related_posts=related_posts)
 

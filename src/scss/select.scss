@@ -20,7 +20,11 @@
   border: 1px solid #e5e5e5;
 
   .select2-selection__choice {
-    margin-top: 7px;
+    margin-top: 6px;
+    padding: 1px 5px;
+    color: #40a9ff;
+    background-color: #fff;
+    border-color: #40a9ff;
   }
 }
 
@@ -58,4 +62,12 @@
 .select2-container--default .select2-results__option[aria-selected=true] {
   background-color: #5897fb;
   color: #fff;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+  color: #40a9ff;
+
+  &:hover {
+    color: #40a9ff;
+  }
 }
