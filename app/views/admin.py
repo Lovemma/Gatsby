@@ -151,6 +151,7 @@ def edit_user(user_id):
 def profile():
     form = ProfileForm(CombinedMultiDict((request.files, request.form)))
     if request.method == 'POST':
+        avatar_path = ''
         if form.validate():
             image = form.avatar.data
             intro = form.intro.data
@@ -161,8 +162,13 @@ def profile():
                 current_app.config.get('UPLOAD_FOLDER')) / avatar_path
             image.save(str(uploaded_file))
             form.avatar_path.data = avatar_path
-            set_profile(intro=intro, avatar=avatar_path, github_url=github_url,
-                        linkedin_url=linkedin_url)
+            kw = {'intro': intro, 'github_url': github_url,
+                  'linkedin_url': linkedin_url}
+            if avatar_path:
+                kw.update(avatar=avatar_path)
+            set_profile(**kw)
+        if not avatar_path:
+            form.avatar_path.data = get_profile().avatar
 
     elif request.method == 'GET':
         profile = get_profile()

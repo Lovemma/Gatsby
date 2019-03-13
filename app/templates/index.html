@@ -86,7 +86,7 @@
 
         {% if paginator.has_next %}
             <a class="extend next" rel="next"
-               href="{{ url_for('blog.page', ident=paginator.next_num) }}"
+               href="{{ url_for('blog.page', ident=paginator.next_num) }}">> </a>
         {% endif %}
     </nav>
 {% endblock %}

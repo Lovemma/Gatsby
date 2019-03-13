@@ -91,16 +91,13 @@ def react(user, post):
     elif request.method == 'DELETE':
         rv = post.cancel_reaction(user['gid'])
 
-    stat = ReactStats.get_by_target(post.id, K_POST)
+    stats = post.stats
     reaction_type = None
     if user:
-        reaction_item = ReactItem.get_reaction_item(
-            user['gid'], post.id, K_POST)
-        if reaction_item:
-            reaction_type = reaction_item.reaction_type
+        reaction_type = post.get_reaction_type(user['gid'])
     template = get_template_attribute('utils.html', 'render_react_container')
     return jsonify({'r': int(not rv),
-                    'html': template(stat=stat, reaction_type=reaction_type)
+                    'html': template(stats=stats, reaction_type=reaction_type)
                     })
 
 

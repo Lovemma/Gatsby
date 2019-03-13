@@ -4,6 +4,7 @@ from collections import Counter
 from itertools import groupby
 
 from flask import Blueprint, render_template, session, abort, current_app
+from flask_login import login_required
 
 from app.models import Post, PostTag, Tag
 from app.models.profile import get_profile
@@ -60,6 +61,12 @@ def _post(ident, is_preview=False):
                            stats=stats, reaction_type=reaction_type,
                            liked_comment_ids=liked_comment_ids,
                            related_posts=related_posts)
+
+
+@bp.route('/post/<ident>/preview')
+@login_required
+def preview(ident):
+    return _post(ident=ident, is_preview=True)
 
 
 @bp.route('/archives')

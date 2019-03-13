@@ -47,7 +47,7 @@ def oauth(post_id=None):
     if post_id is None:
         url = '/'
     else:
-        url = url_for('blog.post', post_id=post_id)
+        url = url_for('blog.post', ident=post_id)
 
     user = session.get('user')
     if user:
@@ -89,8 +89,7 @@ def _feed():
     feed = AtomFeed(title=current_app.config.get('SITE_TITLE'),
                     updated=datetime.now(), feed_url=request.url,
                     url=request.host)
-    posts = Post.query.filter_by(status=Post.STATUS_ONLINE).order_by(
-        Post.id.desc()).all()
+    posts = Post.get_all()
     for post in posts:
         body = post.html_content
         summary = post.excerpt
@@ -121,8 +120,7 @@ def search_json():
 
 @cache(MC_KEY_SEARCH)
 def _search_json():
-    posts = Post.query.filter_by(status=Post.STATUS_ONLINE).order_by(
-        Post.id.desc()).all()
+    posts = Post.get_all()
     return [
         {
             'url': post.url,
