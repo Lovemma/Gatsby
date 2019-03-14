@@ -24,7 +24,11 @@ MC_KEY_POST_BY_SLUG = 'post:%s:slug'
 MC_KEY_FEED = 'core:feed'
 MC_KEY_SITEMAP = 'core:sitemap'
 MC_KEY_SEARCH = 'core:search.json'
-MC_KEY_ALL_POSTS = 'core:posts'
+MC_KEY_ALL_POSTS = 'core:posts:%s'
+MC_KEY_ARCHIVES = 'core:archives'
+MC_KEY_ARCHIVE = 'core:archive:%s'
+MC_KEY_TAGS = 'core:tags'
+MC_KEY_TAG = 'core:tag:%s'
 
 BQ_REGEX = re.compile(r'<blockquote>.*?</blockquote>')
 
@@ -134,14 +138,17 @@ class Post(CommentMixin, ReactMixin, BaseModel):
     STATUSES = (
         STATUS_UNPUBLISHED,
         STATUS_ONLINE
-    ) = [False, True]
+    ) = range(2)
+
+    TYPES = (TYPE_ARTICLE, TYPE_PAGE) = range(2)
 
     title = db.Column(db.String(length=100), unique=True)
     author_id = db.Column(db.Integer)
     slug = db.Column(db.String(length=100))
     summary = db.Column(db.String(length=255))
     can_comment = db.Column(db.Boolean, default=True)
-    status = db.Column(db.Boolean, default=STATUSES)
+    status = db.Column(db.Integer, default=STATUS_UNPUBLISHED)
+    type = db.Column(db.Integer, default=TYPE_ARTICLE)
     kind = K_POST
 
     @classmethod
@@ -240,8 +247,15 @@ class Post(CommentMixin, ReactMixin, BaseModel):
         clear_mc(MC_KEY_RELATED % self.id)
         clear_mc(MC_KEY_POST_BY_SLUG % self.slug)
         for key in [MC_KEY_FEED, MC_KEY_SITEMAP, MC_KEY_SEARCH,
-                    MC_KEY_ALL_POSTS]:
+                    MC_KEY_ARCHIVES, MC_KEY_TAGS]:
             clear_mc(key)
+
+        for i in [True, False]:
+            clear_mc(MC_KEY_ALL_POSTS % i)
+        clear_mc(MC_KEY_ARCHIVE % self.created_at.year)
+
+        for tag in self.tags:
+            clear_mc(MC_KEY_TAG % tag.id)
 
     @classmethod
     @cache(MC_KEY_POST_BY_SLUG % '{slug}')
@@ -249,15 +263,28 @@ class Post(CommentMixin, ReactMixin, BaseModel):
         return cls.query.filter_by(slug=slug).first()
 
     @classmethod
-    @cache(MC_KEY_ALL_POSTS)
-    def get_all(cls):
-        return cls.query.filter_by(status=cls.STATUS_ONLINE).all()
+    @cache(MC_KEY_ALL_POSTS % '{with_page}')
+    def get_all(cls, with_page=True):
+        if with_page:
+            return cls.query.filter_by(status=cls.STATUS_ONLINE).order_by(
+                cls.id.desc()).all()
+        return cls.query.filter_by(status=cls.STATUS_ONLINE,
+                                   type=cls.TYPE_ARTICLE).order_by(
+            cls.id.desc()).all()
 
     @classmethod
     def cache(cls, ident):
         if str(ident).isdigit() or hasattr(ident, 'post_id'):
             return super().cache(ident)
         return cls.get_by_slug(ident)
+
+    @property
+    def is_page(self):
+        return self.type == self.TYPE_PAGE
+
+    @property
+    def url(self):
+        return f'/page/{self.slug}' if self.is_page else super().url
 
 
 class Tag(BaseModel):

@@ -1374,6 +1374,10 @@ hr {
     .recent-posts {
         padding: 30px;
     }
+
+    #sidebar {
+        display: none;
+    }
 }
 
 @media screen and (max-width: 576px) {
@@ -1395,10 +1399,6 @@ hr {
 
     .gitment-root-container {
         padding: 10px 0 10px 10px;
-    }
-
-    #sidebar {
-        display: none;
     }
 
     .post-list {

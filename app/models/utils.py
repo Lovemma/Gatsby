@@ -49,6 +49,15 @@ class Empty:
     def next(self):
         raise StopIteration
 
+    def __getattr__(self, item):
+        return ''
+
+    def __setattr__(self, key, value):
+        return self
+
+    def __delattr__(self, item):
+        return self
+
 
 empty = Empty()
 
@@ -65,26 +74,6 @@ def trunc_utf8(string, num, etc='...'):
     if etc:
         ret += etc
     return ret
-
-
-class Null:
-    def __call__(self, *args, **kwargs):
-        return self
-
-    def __getattr__(self, item):
-        return ''
-
-    def __setattr__(self, key, value):
-        return self
-
-    def __delattr__(self, item):
-        return self
-
-    def __repr__(self):
-        return '<Null>'
-
-    def __str__(self):
-        return 'Null'
 
 
 class AttrDict(dict):
@@ -128,7 +117,7 @@ class Pagination:
         return self.page + 1
 
     def iter_pages(self, left_edge=2, left_current=2,
-                   right_current=5, right_edge=2):
+                   right_current=2, right_edge=2):
         last = 0
         for num in range(1, self.pages + 1):
             if num <= left_edge or \

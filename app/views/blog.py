@@ -7,8 +7,11 @@ from flask import Blueprint, render_template, session, abort, current_app
 from flask_login import login_required
 
 from app.models import Post, PostTag, Tag
+from app.models.mc import cache
 from app.models.profile import get_profile
 from app.models.utils import Pagination
+from app.models.blog import (MC_KEY_ARCHIVES, MC_KEY_ARCHIVE, MC_KEY_TAGS,
+                             MC_KEY_TAG)
 
 bp = Blueprint('blog', __name__, url_prefix='/')
 
@@ -21,7 +24,7 @@ def index():
 def _posts(page=1):
     PER_PAGE = current_app.config.get('PER_PAGE')
     start = (page - 1) * PER_PAGE
-    posts = Post.get_all()
+    posts = Post.get_all(with_page=False)
     total = len(posts)
     posts = posts[start: start + PER_PAGE]
     paginator = Pagination(page, PER_PAGE, total)
@@ -64,12 +67,13 @@ def _post(ident, is_preview=False):
 
 
 @bp.route('/post/<ident>/preview')
-@login_required
+# @login_required
 def preview(ident):
     return _post(ident=ident, is_preview=True)
 
 
 @bp.route('/archives')
+@cache(MC_KEY_ARCHIVES)
 def archives():
     rv = {
         year: list(items) for year, items in groupby(
@@ -83,15 +87,18 @@ def archives():
 
 
 @bp.route('/archive/<year>')
+@cache(MC_KEY_ARCHIVE % '{year}')
 def archive(year):
     posts = Post.query.filter(Post.status == Post.STATUS_ONLINE,
-                              Post.created_at >= f'{year}-01-01').order_by(
+                              Post.created_at >= f'{year}-01-01',
+                              Post.created_at < f'{int(year) + 1}-01-01').order_by(
         Post.id.desc()).all()
     archives = [(year, posts)]
     return render_template('archives.html', archives=archives)
 
 
 @bp.route('/tags')
+@cache(MC_KEY_TAGS)
 def tags():
     tag_ids = PostTag.query.with_entities(PostTag.tag_id).all()
     counter = Counter(tag_ids)
@@ -103,6 +110,7 @@ def tags():
 
 
 @bp.route('/tag/<int:tag_id>/')
+@cache(MC_KEY_TAG % '{tag_id}')
 def tag(tag_id):
     tag = Tag.cache(tag_id)
     post_ids = PostTag.query.filter_by(tag_id=tag_id).order_by(

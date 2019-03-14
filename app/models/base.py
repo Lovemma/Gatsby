@@ -10,6 +10,7 @@ from .mc import cache, clear_mc
 
 MC_KEY_ITEM_BY_ID = '%s:%s'
 
+_redis = None
 
 class BaseModel(db.Model):
     __abstract__ = True
@@ -25,10 +26,10 @@ class BaseModel(db.Model):
 
     @property
     def redis(self):
-        if self._redis is None:
-            redis = context.get('redis')
-            self._redis = redis
-        return self._redis
+        global _redis
+        if _redis is None:
+            _redis = context.get('redis')
+        return _redis
 
     @classmethod
     def get_or_create(cls, **kwargs):

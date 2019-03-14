@@ -10,7 +10,7 @@
 
     <ul uk-tab>
         <li class="uk-active">
-            <a href="{{ url_for('admin.list_posts') }}">List({{ total }})</a>
+            <a href="{{ url_for('admin.list_posts', page=1) }}">List({{ total }})</a>
         </li>
         <li><a href="{{ url_for('admin.new_post') }}">Create</a></li>
     </ul>
@@ -71,6 +71,37 @@
 
         </tbody>
     </table>
+
+    <ul class="uk-pagination uk-flex-center">
+        {% if paginator.has_prev %}
+            <li>
+                <a href="{{ url_for('admin.list_posts', page=paginator.prev_num) }}">
+                    <span uk-pagination-previous></span>
+                </a>
+            </li>
+        {% endif %}
+        {% for page in paginator.iter_pages() %}
+            {% if page %}
+                {% if page == paginator.page %}
+                    <li class="uk-active"><span>{{ page }}</span></li>
+                {% else %}
+                    <li>
+                        <a href="{{ url_for('admin.list_posts', page=page) }}">{{ page }}</a>
+                    </li>
+                {% endif %}
+            {% else %}
+                <li class="uk-disabled"><span>...</span></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if paginator.has_next %}
+            <li>
+                <a href="{{ app.url_for('admin.list_posts', page=paginator.next_num) }}">
+                    <span uk-pagination-next></span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
 {% endblock %}
 
 {% block bottom_script %}

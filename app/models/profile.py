@@ -7,7 +7,8 @@ from pathlib import Path
 from flask import current_app
 from jsonschema import validate
 
-from .utils import Null, AttrDict
+from .mc import cache
+from .utils import empty, AttrDict
 
 schema = {
     'type': 'object',
@@ -19,12 +20,14 @@ schema = {
     }
 }
 PROFILE_FILE = 'profile.json'
+MC_KEY_PROFILE = 'profile'
 
 
+@cache(MC_KEY_PROFILE)
 def get_profile():
     file = Path(current_app.config.get('HERE')) / PROFILE_FILE
     if not os.path.exists(file):
-        return Null()
+        return empty
 
     with open(file) as f:
         return AttrDict(json.load(f))

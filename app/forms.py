@@ -65,7 +65,8 @@ class PostForm(FlaskForm):
     author_id = SelectField('AuthorId', default='',
                             validators=[DataRequired()])
     status = SwitchField('Published', choices=[('on', 1), ('off', 0)],
-                            default='on')
+                         default='on')
+    is_page = BooleanField('IsPage', default=False)
     submit = SubmitField('Submit')
 
 

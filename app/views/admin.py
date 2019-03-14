@@ -6,10 +6,12 @@ from flask_login import login_required
 from werkzeug.datastructures import CombinedMultiDict
 from werkzeug.utils import secure_filename
 
+from app.config import PER_PAGE
 from app.forms import UserForm, PostForm, ProfileForm
 from app.models import Post, User, Tag
-from app.models.user import generate_password
 from app.models.profile import get_profile, set_profile
+from app.models.user import generate_password
+from app.models.utils import Pagination
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -17,21 +19,25 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @bp.route('/')
 @login_required
 def index():
-    title = request.args.get('title', 'World')
-    # post = Post(title=title)
-    # db.session.add(post)
-    # db.session.commit()
-
     return render_template('admin/index.html')
 
 
+@bp.route('/posts/<page>')
 @bp.route('/posts')
 @login_required
-def list_posts():
+def list_posts(page=1):
+    return _get_post_context(page)
+
+
+def _get_post_context(page=1):
+    page = int(page)
+    start = (page - 1) * PER_PAGE
     posts = Post.query.all()
     total = len(posts)
-    return render_template('admin/list_posts.html',
-                           posts=posts, total=total, msg='')
+    posts = posts[start:start + PER_PAGE]
+    paginator = Pagination(page, PER_PAGE, total)
+    return render_template('admin/list_posts.html', posts=posts, total=total,
+                           msg='', paginator=paginator, page=page)
 
 
 @bp.route('/posts/new', methods=['GET', 'POST'])
@@ -60,20 +66,22 @@ def _post(post_id=None):
         form.status.data = form.status.data == 'on'
         tags = form.tags.data
         content = form.content.data
+        is_page = form.is_page.data
         del form.tags
         del form.content
+        del form.is_page
         form.populate_obj(post)
+        if is_page:
+            post.type = Post.TYPE_PAGE
         post.save()
         post.update_tags(tags)
         post.set_content(content)
-        posts = Post.query.all()
-        total = len(posts)
-        context = {'posts': posts, 'total': total, 'msg': msg}
-        return render_template('admin/list_posts.html', **context)
+        return _get_post_context()
     elif post_id is not None:
         form = PostForm(obj=post)
         form.tags.data = [tag.name for tag in post.tags]
         form.can_comment.data = post.can_comment
+        form.is_page.data = post.is_page
         form.status.data = 'on' if post.status else 'off'
         form.submit.label.text = 'Update'
     tags = Tag.query.all()
