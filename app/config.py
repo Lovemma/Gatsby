@@ -31,6 +31,8 @@ SITE_TITLE = 'My Blog'
 
 PER_PAGE = 10
 
+SENTRY_DSN = ''
+
 try:
     from local_settings import *
 except ImportError:

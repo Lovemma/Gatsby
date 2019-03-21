@@ -19,6 +19,7 @@ blinker = "*"
 jsonschema = "*"
 pygments = "*"
 cssmin = "*"
+raven = "*"
 
 [requires]
 python_version = "3.7"

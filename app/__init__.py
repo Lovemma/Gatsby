@@ -10,7 +10,7 @@ from werkzeug.contrib.cache import MemcachedCache
 from werkzeug.local import LocalProxy, LocalStack
 
 from app import config
-from .extenions import db, auth
+from .extenions import db, auth, sentry
 from .views.utils import register_blueprint
 
 _context_stack = LocalStack()
@@ -48,13 +48,15 @@ def setup_jinja2_environment(app):
     app.jinja_env.globals['SHOW_PROFILE'] = app.config.get('SHOW_PROFILE')
 
 
-def create_app(config_name='default'):
+def create_app():
     app = Flask(__name__)
     app.request_class = Request
     app.config.from_object(config)
 
     db.init_app(app)
     auth.init_app(app)
+    if sentry is not None:
+        sentry.init_app(app, dsn=config.SENTRY_DSN)
 
     register_blueprint('app.views', app)
     setup_jinja2_environment(app)
